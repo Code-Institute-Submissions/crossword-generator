@@ -1,4 +1,4 @@
-from constants import get_large_letter
+from constants import get_large_letter, Colors, UniChars, AnsiCommands
 
 class Crossword:
     """Represents a crossword object"""
@@ -9,13 +9,18 @@ class Crossword:
         self.print()
 
     def print(self):
+        light_gray = Colors.get_background_color(220, 220, 220)
+        dark_gray = Colors.get_background_color(0, 0, 0)
+        text_color = Colors.get_foreground_color(0, 0, 0)
+        print()
+        print("Here's the crossword : ")
         for row in self.grid:
             display_chars = []
             for char in row:
                 if char == '_':
-                    display_chars.append('*/')
+                    display_chars.append(f"{dark_gray}  {AnsiCommands.DEFAULT_COLOR}")
                 else:
-                    display_chars.append(get_large_letter(char))
+                    display_chars.append(f"{light_gray}{text_color}{get_large_letter(char)}")
             str = ''.join(display_chars)
             print(str)
         

@@ -44,17 +44,17 @@ class Colors(str, enum.Enum):
         red = random.randint(0, 255)
         green = random.randint(0, 255)
         blue = random.randint(0, 255)
-        return f"\x1b[38;2;{red};{green};{blue}"
+        return f"\x1b[38;2;{red};{green};{blue}m"
 
     @staticmethod
     def get_foreground_color(r, g, b):
         """Return a code to change the foreground color to the values provided"""
-        return f"\x1b[38;2;{r};{g};{b}"
+        return f"\x1b[38;2;{r};{g};{b}m"
 
     @staticmethod
     def get_background_color(r, g, b):
         """Return a code to change the background color to the values provided"""
-        return f"\x1b[48;2;{r};{g};{b}"
+        return f"\x1b[48;2;{r};{g};{b}m"
 
 class AnsiCommands(str, enum.Enum):
     """
