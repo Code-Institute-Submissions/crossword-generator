@@ -1,14 +1,10 @@
-from asyncore import write
-from logging.config import dictConfig
-
-
 def main():
     word_dict = {}
     # load_large_dictionary()
     
     # load_word_frequencies()
     
-    compare_dict_against_frequencies()
+    # compare_dict_against_frequencies()
     
     """ with open('large_dict_words_only.txt', 'r') as file:
         for word in file:

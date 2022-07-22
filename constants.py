@@ -46,6 +46,16 @@ class Colors(str, enum.Enum):
         blue = random.randint(0, 255)
         return f"\x1b[38;2;{red};{green};{blue}"
 
+    @staticmethod
+    def get_foreground_color(r, g, b):
+        """Return a code to change the foreground color to the values provided"""
+        return f"\x1b[38;2;{r};{g};{b}"
+
+    @staticmethod
+    def get_background_color(r, g, b):
+        """Return a code to change the background color to the values provided"""
+        return f"\x1b[48;2;{r};{g};{b}"
+
 class AnsiCommands(str, enum.Enum):
     """
     Holds the cursor movement and output deletion commands
@@ -63,4 +73,9 @@ class AnsiCommands(str, enum.Enum):
     NORMAL = "\x1b[0m"
     FAINT = "\x1b[2m"
     DEFAULT_COLOR = "\x1b[00m"
-    
+
+def get_large_letter(char):
+    unicode_value = ord(char)
+    large_equivalent = unicode_value + 65216
+
+    return chr(large_equivalent)
