@@ -1,4 +1,5 @@
-from constants import get_large_letter, Colors, UniChars, AnsiCommands
+import random
+from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
 class Word:
     def __init__(self, orientation, string, x, y):
@@ -10,9 +11,35 @@ class Word:
 class Crossword:
     """Represents a crossword object"""
     def __init__(self, cols, rows, word_dict):
+        self.cols = cols
+        self.rows = rows
         self.grid = [["_" for i in range(cols)] for j in range(rows)]
         self.word_dict = word_dict
         self.print()
+        self.generate_words()
+        self.print()
+
+    def generate_words(self):
+        """This function generates the words for the crossword"""
+        start_positions = []
+        blank_chars = ['_' for i in range(self.cols)]
+        blank_string = ''.join(blank_chars)
+        print(f"{blank_string} (length = {len(blank_string)})")
+        first_word = Word(Orientation.HORIZONTAL, blank_string, 0, 0)
+        matches = find_matches(first_word.string, self.word_dict)
+        choice = random.choice(matches)
+        print(choice)
+        self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+
+    def add_word_to_grid(self, word):
+        """Adds a word to the crossword grid in the correct orientation"""
+        for i in range(len(word.string)):
+            if word.orientation == Orientation.HORIZONTAL:
+                self.grid[word.start_x + i][word.start_y] = word.string[i]
+            else:
+                self.grid[word.start_x][word.start_y + i] = word.string[i]
+
+
 
     def print(self):
         """Print the crossword to the terminal"""
