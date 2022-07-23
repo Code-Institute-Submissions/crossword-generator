@@ -1,5 +1,12 @@
 from constants import get_large_letter, Colors, UniChars, AnsiCommands
 
+class Word:
+    def __init__(self, orientation, string, x, y):
+        self.orientation = orientation
+        self.string = string
+        self.start_x = x
+        self.start_y = y
+
 class Crossword:
     """Represents a crossword object"""
     def __init__(self, cols, rows):
@@ -18,11 +25,11 @@ class Crossword:
             display_chars = []
             for char in row:
                 if char == '_':
-                    display_chars.append(f"{dark_gray}  {AnsiCommands.DEFAULT_COLOR}")
+                    display_chars.append(f"{dark_gray}{UniChars.EMPTY_SQUARE}{AnsiCommands.DEFAULT_COLOR}")
                 else:
                     display_chars.append(f"{light_gray}{text_color}{get_large_letter(char)}")
-            str = ''.join(display_chars)
-            print(str)
+            string = ''.join(display_chars)
+            print(string)
         
 
 def main():

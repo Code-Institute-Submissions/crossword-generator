@@ -20,6 +20,7 @@ class UniChars(str, enum.Enum):
     LEFT_ARROW = "\u27F5"
     STAR = "\u2605"
     SUPERSCRIPT = "x\u2077"
+    EMPTY_SQUARE = "\u2B1C"
 
 class Colors(str, enum.Enum):
     """
@@ -74,7 +75,15 @@ class AnsiCommands(str, enum.Enum):
     FAINT = "\x1b[2m"
     DEFAULT_COLOR = "\x1b[00m"
 
+class Orientation (enum.Enum):
+    """
+    Represents the 2 directions a word can be printed in
+    """
+    HORIZONTAL = "Across"
+    VERTICAL = "Down"
+
 def get_large_letter(char):
+    """Returns a large (double width) version of the character supplied"""
     unicode_value = ord(char)
     large_equivalent = unicode_value + 65216
 
