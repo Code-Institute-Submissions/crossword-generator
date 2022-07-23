@@ -9,10 +9,9 @@ class Word:
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, cols, rows):
+    def __init__(self, cols, rows, word_dict):
         self.grid = [["_" for i in range(cols)] for j in range(rows)]
-        self.grid[0][6] = 'a'
-        self.grid[0][7] = 's'
+        self.word_dict = word_dict
         self.print()
 
     def print(self):
@@ -35,7 +34,6 @@ class Crossword:
 
 def main():
     """Main entry point for the program"""
-    crossword = Crossword(11, 11)
     word_dict = {}
     with open('data/large_dict_words_only.txt', 'r') as file:
         for word in file:
@@ -48,8 +46,7 @@ def main():
                 word_dict[length].append(word)
     for key, value in word_dict.items():
         print(f"Number of {key}-letter words is {len(value)}")
-    print(word_dict[6][0])
-    find_matches("anti_____", word_dict)
+    crossword = Crossword(11, 11, word_dict)
 
 def find_matches(word, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
