@@ -36,13 +36,15 @@ class Crossword:
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
 
-        # Only check neighbours if this cell is blank - adding a letter at the start
-        # or end of an existing word should be avoided, as it may not result in a new legal
-        # word. Running a new word through an existing word is fine, as it does not alter
-        # the existing word. In fact, it's the whole point of a crossword.
+        # If this cell already contains a letter, it is already part of a word
+        # running in the orthogonal direction, so it is a legal cell in a potential
+        # new word
         if self.grid(row, col) != "_":
             return True
 
+        # If this cell is blank, then the cells neighbouring it must be blank. Otherwise, 
+        # a new letter would be added at the start or end of an existing word, thereby
+        # altering it.
         if orientation == Orientation.HORIZONTAL:
             has_cell_to_left = col > 0
             has_cell_to_right = col < self.cols
