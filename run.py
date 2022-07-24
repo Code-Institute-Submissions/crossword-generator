@@ -1,14 +1,14 @@
+from ast import Or
 from grp import getgrgid
 import random
-from tkinter import HORIZONTAL, VERTICAL
 from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
 class Word:
-    def __init__(self, orientation, string, x, y):
+    def __init__(self, orientation, string, row, col):
         self.orientation = orientation
         self.string = string
-        self.start_x = x
-        self.start_y = y
+        self.start_row = row
+        self.start_col = col
 
 class Crossword:
     """Represents a crossword object"""
@@ -28,15 +28,17 @@ class Crossword:
         blank_chars = ['_' for i in range(self.cols)]
         blank_string = ''.join(blank_chars)
         print(f"{blank_string} (length = {len(blank_string)})")
-        first_word = Word(Orientation.HORIZONTAL, blank_string, 0, 0)
-        self.intersections = [(0, 2, Orientation.VERTICAL), 
-                              (0, 4, Orientation.VERTICAL), 
-                              (0, 6, Orientation.VERTICAL), 
-                              (0, 8, Orientation.VERTICAL), 
+        self.intersections = [(0, 2, Orientation.VERTICAL),
+                              (0, 4, Orientation.VERTICAL),
+                              (0, 6, Orientation.VERTICAL),
+                              (0, 8, Orientation.VERTICAL),
                               (0, 10, Orientation.VERTICAL)]
-        matches = find_matches(first_word.string, self.word_dict)
+        matches = find_matches(blank_string, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+
+        second_word = self._generate_new_word()
+        self.add_word_to_grid(second_word)
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
@@ -44,8 +46,11 @@ class Crossword:
         # Shuffle the intersections list and pop the last one
         random.shuffle(self.intersections)
         root_cell = self.intersections.pop()
-        root_row, root_col, orientation = [root_cell]
-        potential_word = [self.grid[root_cell[root_row, root_col]]]
+        (root_row, root_col, orientation) = root_cell
+        print(f"root_row == {root_row}, root_col == {root_col}")
+        potential_word = []
+        potential_word.append(self.grid[root_row][root_col])
+        self.print()
 
         if orientation == Orientation.VERTICAL:
             row = root_row + 1
@@ -58,16 +63,32 @@ class Crossword:
             row = root_row - 1
             while row >= 0:
                 if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
-                    potential_word.append(self.grid[row][root_col])
+                    potential_word.insert(0, self.grid[row][root_col])
                 else: 
                     break
                 row -= 1
         elif orientation == Orientation.HORIZONTAL:
-            
+            col = root_col + 1
+            while col < self.cols:
+                if self._check_cell_is_legal(root_row, col, Orientation.HORIZONTAL):
+                    potential_word.append(self.grid[root_row][col])
+                else:
+                    break
+                col += 1
+            col = root_col - 1
+            while col >= 0:
+                if self._check_cell_is_legal(root_row, col, Orientation.HORIZONTAL):
+                    potential_word.insert(0, self.grid[root_row][col])
+                else:
+                    break
 
+        print(''.join(potential_word))
+        matches = find_matches(potential_word, self.word_dict)
+        choice = random.choice(matches)
+        print(f"Word : orientation {orientation}, string {choice}, row {root_row}, col {root_col}")
 
-
-
+        return Word(orientation, choice, root_row, root_col)
+        
 
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
@@ -75,22 +96,24 @@ class Crossword:
         # If this cell already contains a letter, it is already part of a word
         # running in the orthogonal direction, so it is a legal cell in a potential
         # new word
-        if self.grid(row, col) != "_":
+        if self.grid[row][col] != "_":
+            print(f"cell at row {row}, col {col} is not empty")
             return True
 
         # If this cell is blank, then the cells neighbouring it must be blank. Otherwise, 
         # a new letter would be added at the start or end of an existing word, thereby
         # altering it.
-        if orientation == Orientation.HORIZONTAL:
+        if orientation == Orientation.VERTICAL:
             has_cell_to_left = col > 0
-            has_cell_to_right = col < self.cols
+            has_cell_to_right = col < self.cols - 1
             if has_cell_to_left and self.grid[row][col - 1] != "_":
                 return False
             if has_cell_to_right and self.grid[row][col + 1] != "_":
                 return False
-        elif orientation == Orientation.VERTICAL:
+        elif orientation == Orientation.HORIZONTAL:
             has_cell_above = row > 0
-            has_cell_below = row < self.rows
+            has_cell_below = row < self.rows - 1
+            print(f"has_cell_above == {has_cell_above}, has_cell_below == {has_cell_below}")
             if has_cell_above and self.grid[row -1][col] != "_":
                 return False
             if has_cell_below and self.grid[row + 1][col] != "_":
@@ -123,9 +146,9 @@ class Crossword:
         """Adds a word to the crossword grid in the correct orientation"""
         for i in range(len(word.string)):
             if word.orientation == Orientation.HORIZONTAL:
-                self.grid[word.start_y][word.start_x + i] = word.string[i]
+                self.grid[word.start_row][word.start_col + i] = word.string[i]
             else:
-                self.grid[word.start_y + i][word.start_x] = word.string[i]
+                self.grid[word.start_row + i][word.start_col] = word.string[i]
 
 
     def print(self):
@@ -157,8 +180,8 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    for key, value in word_dict.items():
-        print(f"Number of {key}-letter words is {len(value)}")
+    """ for key, value in word_dict.items():
+        print(f"Number of {key}-letter words is {len(value)}") """
     crossword = Crossword(11, 11, word_dict)
 
 def find_matches(word, word_dict):
