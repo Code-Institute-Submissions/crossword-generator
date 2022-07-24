@@ -1,6 +1,6 @@
 from grp import getgrgid
 import random
-from tkinter import HORIZONTAL
+from tkinter import HORIZONTAL, VERTICAL
 from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
 class Word:
@@ -17,21 +17,57 @@ class Crossword:
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
-        self.print()
+        self.intersections = []
+
+        # Generate a random crossword layout
         self.generate_words()
         self.print()
 
     def generate_words(self):
         """This function generates the words for the crossword"""
-        start_positions = []
         blank_chars = ['_' for i in range(self.cols)]
         blank_string = ''.join(blank_chars)
         print(f"{blank_string} (length = {len(blank_string)})")
         first_word = Word(Orientation.HORIZONTAL, blank_string, 0, 0)
-        start_positions = [(0, 2), (0, 4), (0, 6), (0, 8), (0, 10)]
+        self.intersections = [(0, 2, Orientation.VERTICAL), 
+                              (0, 4, Orientation.VERTICAL), 
+                              (0, 6, Orientation.VERTICAL), 
+                              (0, 8, Orientation.VERTICAL), 
+                              (0, 10, Orientation.VERTICAL)]
         matches = find_matches(first_word.string, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+
+    def _generate_new_word(self):
+        """Generates one new word in the crossword, if possible"""
+
+        # Shuffle the intersections list and pop the last one
+        random.shuffle(self.intersections)
+        root_cell = self.intersections.pop()
+        root_row, root_col, orientation = [root_cell]
+        potential_word = [self.grid[root_cell[root_row, root_col]]]
+
+        if orientation == Orientation.VERTICAL:
+            row = root_row + 1
+            while row < self.rows:
+                if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
+                    potential_word.append(self.grid[row][root_col])
+                else:
+                    break
+                row += 1
+            row = root_row - 1
+            while row >= 0:
+                if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
+                    potential_word.append(self.grid[row][root_col])
+                else: 
+                    break
+                row -= 1
+        elif orientation == Orientation.HORIZONTAL:
+            
+
+
+
+
 
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
