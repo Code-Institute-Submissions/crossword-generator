@@ -26,23 +26,15 @@ class Crossword:
         blank_chars = ['_' for i in range(self.cols)]
         blank_string = ''.join(blank_chars)
         print(f"{blank_string} (length = {len(blank_string)})")
-        self.intersections = [(0, 2, Orientation.VERTICAL),
-                              (0, 4, Orientation.VERTICAL),
-                              (0, 6, Orientation.VERTICAL),
-                              (0, 8, Orientation.VERTICAL),
-                              (0, 10, Orientation.VERTICAL)]
+        
         matches = find_matches(blank_string, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
 
-        next_word = self._generate_new_word()
-        self.add_word_to_grid(next_word)
+        while len(self.intersections) > 0:
+            next_word = self._generate_new_word()
+            self.add_word_to_grid(next_word)
 
-        next_word = self._generate_new_word()
-        self.add_word_to_grid(next_word)
-
-        next_word = self._generate_new_word()
-        self.add_word_to_grid(next_word)
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
@@ -68,9 +60,15 @@ class Crossword:
             while row >= 0:
                 if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
                     potential_word.insert(0, self.grid[row][root_col])
-                else: 
+
+                    # Move the root row back to match the new legal start to the potential word
+                    root_row = row
+                else:
                     break
+
+                # Move the row pointer up one cell
                 row -= 1
+                
         elif orientation == Orientation.HORIZONTAL:
             col = root_col + 1
             while col < self.cols:
@@ -83,16 +81,18 @@ class Crossword:
             while col >= 0:
                 if self._check_cell_is_legal(root_row, col, Orientation.HORIZONTAL):
                     potential_word.insert(0, self.grid[root_row][col])
+
+                    # Move the root column back to match the new legal start to the potential word
+                    root_col = col
                 else:
                     break
+                col -= 1
 
         print(''.join(potential_word))
         matches = find_matches(potential_word, self.word_dict)
         choice = random.choice(matches)
-        print(f"Word : orientation {orientation}, string {choice}, row {root_row}, col {root_col}")
-
-        return Word(orientation, choice, root_row, root_col)
         
+        return Word(orientation, choice, root_row, root_col)
 
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
@@ -117,7 +117,7 @@ class Crossword:
         elif orientation == Orientation.HORIZONTAL:
             has_cell_above = row > 0
             has_cell_below = row < self.rows - 1
-            print(f"has_cell_above == {has_cell_above}, has_cell_below == {has_cell_below}")
+            # print(f"has_cell_above == {has_cell_above}, has_cell_below == {has_cell_below}")
             if has_cell_above and self.grid[row -1][col] != "_":
                 return False
             if has_cell_below and self.grid[row + 1][col] != "_":
@@ -147,19 +147,33 @@ class Crossword:
 
     def add_word_to_grid(self, word):
         """Adds a word to the crossword grid in the correct orientation"""
-        for i, value in enumerate(word.string):
+
+        # Print the new word to the termimal
+        print(f"Word : {word.orientation}, string {word.string}, row {word.start_row}, col {word.start_col}")
+
+        for i, _ in enumerate(word.string):
             if word.orientation == Orientation.HORIZONTAL:
                 self.grid[word.start_row][word.start_col + i] = word.string[i]
             else:
                 self.grid[word.start_row + i][word.start_col] = word.string[i]
         
         # Calculate the new intersections on this word
-        intersections = []
         new_start_col = word.start_col
         new_start_row = word.start_row
-        new_orientation = None
-        orthogonal_orientation = Orientation.HORIZONTAL if word.orientation == Orientation.VERTICAL else Orientation.HORIZONTAL
+        new_orientation = word.orientation.opposite()
+        if new_orientation == Orientation.VERTICAL:
+            new_start_col += 2
+            while new_start_col < self.cols:
+                self.intersections.append((new_start_row, new_start_col, new_orientation))
+                new_start_col += 2
+        else:
+            new_start_row += 2
+            while new_start_row < self.rows:
+                self.intersections.append((new_start_row, new_start_col, new_orientation))
+                new_start_row += 2
 
+        # Print the intersections_list to the terminal
+        print(f"self.intersections == {self.intersections}")
 
 
     def print(self):
