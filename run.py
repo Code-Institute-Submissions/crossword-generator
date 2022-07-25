@@ -37,8 +37,14 @@ class Crossword:
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
 
-        second_word = self._generate_new_word()
-        self.add_word_to_grid(second_word)
+        next_word = self._generate_new_word()
+        self.add_word_to_grid(next_word)
+
+        next_word = self._generate_new_word()
+        self.add_word_to_grid(next_word)
+
+        next_word = self._generate_new_word()
+        self.add_word_to_grid(next_word)
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
@@ -118,7 +124,7 @@ class Crossword:
                 return False
             if has_cell_below and self.grid[row + 1][col] != "_":
                 return False
-        
+
         return True
 
     def _vertical_neighbour_check(self, row, col):
@@ -138,13 +144,12 @@ class Crossword:
                 cell_is_legal = False
             if has_cell_to_right and self.grid[row][col + 1] != "_":
                 cell_is_legal = False
-        
+
         return cell_is_legal
-        
 
     def add_word_to_grid(self, word):
         """Adds a word to the crossword grid in the correct orientation"""
-        for i in range(len(word.string)):
+        for i, value in enumerate(word.string):
             if word.orientation == Orientation.HORIZONTAL:
                 self.grid[word.start_row][word.start_col + i] = word.string[i]
             else:
@@ -180,8 +185,6 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    """ for key, value in word_dict.items():
-        print(f"Number of {key}-letter words is {len(value)}") """
     crossword = Crossword(11, 11, word_dict)
 
 def find_matches(word, word_dict):
@@ -200,6 +203,9 @@ def find_matches(word, word_dict):
                 match = False
         if match:
             matches.append(potential_match)
+    if len(matches) == 0:
+        error_msg = f"No words match this string : '{word}'"
+        raise Exception(error_msg)
     return matches
 
 
