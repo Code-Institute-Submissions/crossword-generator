@@ -1,5 +1,3 @@
-from ast import Or
-from grp import getgrgid
 import random
 from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
@@ -154,6 +152,14 @@ class Crossword:
                 self.grid[word.start_row][word.start_col + i] = word.string[i]
             else:
                 self.grid[word.start_row + i][word.start_col] = word.string[i]
+        
+        # Calculate the new intersections on this word
+        intersections = []
+        new_start_col = word.start_col
+        new_start_row = word.start_row
+        new_orientation = None
+        orthogonal_orientation = Orientation.HORIZONTAL if word.orientation == Orientation.VERTICAL else Orientation.HORIZONTAL
+
 
 
     def print(self):

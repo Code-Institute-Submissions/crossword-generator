@@ -1,5 +1,6 @@
 import enum
 import random
+from tkinter import HORIZONTAL, VERTICAL
 
 class UniChars(str, enum.Enum):
     """ 
@@ -81,6 +82,14 @@ class Orientation (enum.Enum):
     """
     HORIZONTAL = "Across"
     VERTICAL = "Down"
+
+    def opposite(self):
+        """Returns the orthogonal direction"""
+        if self == HORIZONTAL:
+            return VERTICAL
+        else:
+            return HORIZONTAL
+
 
 def get_large_letter(char):
     """Returns a large (double width) version of the character supplied"""
