@@ -10,12 +10,12 @@ class Word:
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, cols, rows, word_dict):
+    def __init__(self, rows, cols, word_dict):
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
-        self.intersections = []
+        self.intersections = set()
 
         # Generate a random crossword layout
         self.generate_words()
@@ -30,23 +30,32 @@ class Crossword:
         matches = find_matches(blank_string, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+        self.print()
 
         while len(self.intersections) > 0:
+            # Print the intersections_list to the terminal
             next_word = self._generate_new_word()
             self.add_word_to_grid(next_word)
+            
+            self.print()
+            self._print_intersections()
+            input("Press enter to continue")
+            print('---------------------------------------------------------')
 
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
 
         # Shuffle the intersections list and pop the last one
-        random.shuffle(self.intersections)
-        root_cell = self.intersections.pop()
+        intersection_list = list(self.intersections)
+        random.shuffle(intersection_list)
+        root_cell = intersection_list.pop()
+        self.intersections.remove(root_cell)
         (root_row, root_col, orientation) = root_cell
         print(f"root_row == {root_row}, root_col == {root_col}")
         potential_word = []
         potential_word.append(self.grid[root_row][root_col])
-        self.print()
+        
 
         if orientation == Orientation.VERTICAL:
             row = root_row + 1
@@ -149,7 +158,7 @@ class Crossword:
         """Adds a word to the crossword grid in the correct orientation"""
 
         # Print the new word to the termimal
-        print(f"Word : {word.orientation}, string {word.string}, row {word.start_row}, col {word.start_col}")
+        print(f"Word : {word.orientation.value}, string {word.string}, row {word.start_row}, col {word.start_col}")
 
         for i, _ in enumerate(word.string):
             if word.orientation == Orientation.HORIZONTAL:
@@ -162,18 +171,37 @@ class Crossword:
         new_start_row = word.start_row
         new_orientation = word.orientation.opposite()
         if new_orientation == Orientation.VERTICAL:
-            new_start_col += 2
             while new_start_col < self.cols:
-                self.intersections.append((new_start_row, new_start_col, new_orientation))
+                cell_above_occupied = self._check_cell_occupied(new_start_row - 1, new_start_col)
+                cell_below_occupied = self._check_cell_occupied(new_start_row + 1, new_start_col)
+                if not cell_above_occupied and not cell_below_occupied:
+                    self.intersections.add((new_start_row, new_start_col, new_orientation))
+                    print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
                 new_start_col += 2
         else:
-            new_start_row += 2
             while new_start_row < self.rows:
-                self.intersections.append((new_start_row, new_start_col, new_orientation))
+                cell_to_left_occupied = self._check_cell_occupied(new_start_row, new_start_col - 1)
+                cell_to_right_occupied = self._check_cell_occupied(new_start_row, new_start_col + 1)
+                if not cell_to_left_occupied and not cell_to_right_occupied:
+                    self.intersections.add((new_start_row, new_start_col, new_orientation))
+                    print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
                 new_start_row += 2
 
-        # Print the intersections_list to the terminal
-        print(f"self.intersections == {self.intersections}")
+    def _check_cell_occupied(self, row, col):
+        """Checks if a cell has been filled with a letter or not. Interprets a cell outside the crossword
+           as being empty"""
+        if row < 0 or col < 0 or row >= self.rows or col >= self.cols:
+            return False
+        if self.grid[row][col] == '_':
+            return False
+        return True
+
+
+    def _print_intersections(self):
+        print()
+        print("Current intersection set : ")
+        for item in self.intersections:
+            print(f"{item[0]},{item[1]},{item[2].value}")
 
 
     def print(self):
@@ -181,6 +209,7 @@ class Crossword:
         light_gray = Colors.get_background_color(220, 220, 220)
         dark_gray = Colors.get_background_color(0, 0, 0)
         text_color = Colors.get_foreground_color(0, 0, 0)
+        print()
         print("Here's the crossword : ")
         for row in self.grid:
             display_chars = []
@@ -205,7 +234,7 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    crossword = Crossword(11, 11, word_dict)
+    crossword = Crossword(9, 9, word_dict)
 
 def find_matches(word, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
