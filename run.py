@@ -30,6 +30,7 @@ class Crossword:
         matches = find_matches(blank_string, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+        
         self.print()
 
         while len(self.intersections) > 0:
@@ -38,7 +39,6 @@ class Crossword:
             if next_word != None:
                 self.add_word_to_grid(next_word)
                 self.print()
-                self._print_intersections()
                 self._prune_intersection_set()
                 self._print_intersections()
                 input("Press enter to continue")
@@ -149,7 +149,7 @@ class Crossword:
         # running in the orthogonal direction, so it is a legal cell in a potential
         # new word
         if self.grid[row][col] != "_":
-            print(f"cell at row {row}, col {col} is not empty")
+            # print(f"cell at row {row}, col {col} is not empty")
             return True
 
         # If this cell is blank, then the cells neighbouring it must be blank. Otherwise, 
@@ -243,35 +243,32 @@ class Crossword:
         
         for item in self.intersections:
             (row, col, orientation) = item
-            cell_before_usable = True
-            cell_after_usable = True
+            cell_before_occupied = False
+            cell_after_occupied = False
             if orientation == Orientation.HORIZONTAL:
                 if col == 0:
-                    cell_before_usable = False
-                    print(f"False : col == 0, before == false")
+                    cell_before_occupied = False
                 if col == self.cols - 1:
-                    cell_after_usable = False
-                    print(f"False : col == self.cols - 1, after_usable = false")
+                    cell_after_occupied = False
                 if col > 0 and self.grid[row][col - 1] != '_':
-                    cell_before_usable = False
-                    print(f"False : col > 0 and grid[row][col - 1] != '_', before_usable = false")
+                    cell_before_occupied = True
                 if col < self.cols - 2 and self.grid[row][col + 1] != '_':
-                    cell_after_usable = False
-                    print(f"False : col < self.cols - 2 and grid[row][col + 1] != '_', after_usable = false")
+                    cell_after_occupied = True
             elif orientation == Orientation.VERTICAL:
                 if row == 0:
-                    cell_before_usable = False
+                    cell_before_occupied = False
                 if row == self.rows - 1:
-                    cell_after_usable = False
+                    cell_after_occupied = False
                 if row > 0 and self.grid[row - 1][col] != '_':
-                    cell_before_usable = False
+                    cell_before_occupied = True
                 if row < self.rows - 2 and self.grid[row + 1][col] != '_':
-                    cell_after_usable = False
+                    cell_after_occupied = True
 
-            if cell_before_usable or cell_after_usable:
-                temp_set.add(item)
-            else:
+            if cell_before_occupied or cell_after_occupied:
                 print(f"Pruning {item}")
+            else:
+                temp_set.add(item)
+            
         self.intersections = temp_set
 
     def _print_intersections(self):
@@ -292,7 +289,7 @@ class Crossword:
             display_chars = []
             for char in row:
                 if char == '_':
-                    display_chars.append(f"{dark_gray}{UniChars.EMPTY_SQUARE}{AnsiCommands.DEFAULT_COLOR}")
+                    display_chars.append(f"{dark_gray}  {AnsiCommands.DEFAULT_COLOR}")
                 else:
                     display_chars.append(f"{light_gray}{text_color}{get_large_letter(char)}{AnsiCommands.DEFAULT_COLOR}")
             string = ''.join(display_chars)
@@ -302,7 +299,7 @@ class Crossword:
 def main():
     """Main entry point for the program"""
     word_dict = {}
-    with open('data/large_dict_words_only.txt', 'r') as file:
+    with open('data/10000-words.txt', 'r') as file:
         for word in file:
             word = word.replace('\n', '')
             length = len(word)
@@ -311,7 +308,7 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    crossword = Crossword(5, 5, word_dict)
+    crossword = Crossword(8, 8, word_dict)
 
 def find_matches(word, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
