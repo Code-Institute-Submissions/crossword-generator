@@ -35,14 +35,14 @@ class Crossword:
         while len(self.intersections) > 0:
             # Print the intersections_list to the terminal
             next_word = self._generate_new_word()
-            self.add_word_to_grid(next_word)
-            
-            self.print()
-            self._print_intersections()
-            self._prune_intersection_set()
-            self._print_intersections()
-            input("Press enter to continue")
-            print('---------------------------------------------------------')
+            if next_word != None:
+                self.add_word_to_grid(next_word)
+                self.print()
+                self._print_intersections()
+                self._prune_intersection_set()
+                self._print_intersections()
+                input("Press enter to continue")
+                print('---------------------------------------------------------')
 
 
     def _generate_new_word(self):
@@ -54,23 +54,25 @@ class Crossword:
         root_cell = intersection_list.pop()
         self.intersections.remove(root_cell)
         (root_row, root_col, orientation) = root_cell
+        original_row = root_row
+        original_col = root_col
         print(f"root_row == {root_row}, root_col == {root_col}")
-        potential_word = []
-        potential_word.append(self.grid[root_row][root_col])
+        candidate = []
+        candidate.append(self.grid[root_row][root_col])
         
 
         if orientation == Orientation.VERTICAL:
             row = root_row + 1
             while row < self.rows:
                 if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
-                    potential_word.append(self.grid[row][root_col])
+                    candidate.append(self.grid[row][root_col])
                 else:
                     break
                 row += 1
             row = root_row - 1
             while row >= 0:
                 if self._check_cell_is_legal(row, root_col, Orientation.VERTICAL):
-                    potential_word.insert(0, self.grid[row][root_col])
+                    candidate.insert(0, self.grid[row][root_col])
 
                     # Move the root row back to match the new legal start to the potential word
                     root_row = row
@@ -84,14 +86,14 @@ class Crossword:
             col = root_col + 1
             while col < self.cols:
                 if self._check_cell_is_legal(root_row, col, Orientation.HORIZONTAL):
-                    potential_word.append(self.grid[root_row][col])
+                    candidate.append(self.grid[root_row][col])
                 else:
                     break
                 col += 1
             col = root_col - 1
             while col >= 0:
                 if self._check_cell_is_legal(root_row, col, Orientation.HORIZONTAL):
-                    potential_word.insert(0, self.grid[root_row][col])
+                    candidate.insert(0, self.grid[root_row][col])
 
                     # Move the root column back to match the new legal start to the potential word
                     root_col = col
@@ -99,11 +101,46 @@ class Crossword:
                     break
                 col -= 1
 
-        print(''.join(potential_word))
-        matches = find_matches(potential_word, self.word_dict)
+        print(''.join(candidate))
+        matches = find_matches(candidate, self.word_dict)
+
+        # If there is no match, try removing characters from the candidate and finding new matches
+        # If no shorter candidate is possible, return None and forget this intersection point
+        while len(matches) == 0:
+            shorter_candidate = self._get_shorter_candidate(
+                                        candidate,
+                                        orientation,
+                                        root_row,
+                                        root_col,
+                                        original_row,
+                                        original_col)
+            if shorter_candidate is None:
+                return None
+            matches = find_matches(shorter_candidate, self.word_dict)
+
         choice = random.choice(matches)
-        
         return Word(orientation, choice, root_row, root_col)
+
+    def _get_shorter_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
+        if orientation == Orientation.HORIZONTAL:
+            # 3 is the minimum word length, and the word must include the original intersection
+            while len(candidate) > 3 and start_col + len(candidate) > original_col:
+                # While cells can still be removed, remove the last one. If it is empty, 
+                # then this new candidate does not abut an existing word, so return it
+                removed_cell = candidate.pop()
+                if removed_cell == '_':
+                    return candidate
+            # No shorter candidates are possible, so return None
+            return None
+        elif orientation == Orientation.VERTICAL:
+            # 3 is the minimum word length, and the word must include the original intersection
+            while len(candidate) > 3 and start_row + len(candidate) > original_row:
+                removed_cell = candidate.pop()
+                if removed_cell == '_':
+                    return candidate
+            # No shorter candidates are possible, so return None
+            return None
+
 
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
@@ -292,9 +329,7 @@ def find_matches(word, word_dict):
                 match = False
         if match:
             matches.append(potential_match)
-    if len(matches) == 0:
-        error_msg = f"No words match this string : '{word}'"
-        raise Exception(error_msg)
+    
     return matches
 
 
