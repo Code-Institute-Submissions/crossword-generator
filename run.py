@@ -39,6 +39,8 @@ class Crossword:
             
             self.print()
             self._print_intersections()
+            self._prune_intersection_set()
+            self._print_intersections()
             input("Press enter to continue")
             print('---------------------------------------------------------')
 
@@ -196,6 +198,44 @@ class Crossword:
             return False
         return True
 
+    def _prune_intersection_set(self):
+        """Removes an intersection from the intersection set if the cell before or after 
+           it is unusable (already occupied or out of range). This prevents new words being
+           added that abut, but do not intersect, existing words in the crossword"""
+        temp_set = set()
+        
+        for item in self.intersections:
+            (row, col, orientation) = item
+            cell_before_usable = True
+            cell_after_usable = True
+            if orientation == Orientation.HORIZONTAL:
+                if col == 0:
+                    cell_before_usable = False
+                    print(f"False : col == 0, before == false")
+                if col == self.cols - 1:
+                    cell_after_usable = False
+                    print(f"False : col == self.cols - 1, after_usable = false")
+                if col > 0 and self.grid[row][col - 1] != '_':
+                    cell_before_usable = False
+                    print(f"False : col > 0 and grid[row][col - 1] != '_', before_usable = false")
+                if col < self.cols - 2 and self.grid[row][col + 1] != '_':
+                    cell_after_usable = False
+                    print(f"False : col < self.cols - 2 and grid[row][col + 1] != '_', after_usable = false")
+            elif orientation == Orientation.VERTICAL:
+                if row == 0:
+                    cell_before_usable = False
+                if row == self.rows - 1:
+                    cell_after_usable = False
+                if row > 0 and self.grid[row - 1][col] != '_':
+                    cell_before_usable = False
+                if row < self.rows - 2 and self.grid[row + 1][col] != '_':
+                    cell_after_usable = False
+
+            if cell_before_usable or cell_after_usable:
+                temp_set.add(item)
+            else:
+                print(f"Pruning {item}")
+        self.intersections = temp_set
 
     def _print_intersections(self):
         print()
@@ -234,7 +274,7 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    crossword = Crossword(9, 9, word_dict)
+    crossword = Crossword(5, 5, word_dict)
 
 def find_matches(word, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
