@@ -60,7 +60,6 @@ class Crossword:
         candidate = []
         candidate.append(self.grid[root_row][root_col])
         
-
         if orientation == Orientation.VERTICAL:
             row = root_row + 1
             while row < self.rows:
@@ -102,6 +101,9 @@ class Crossword:
                 col -= 1
 
         print(''.join(candidate))
+        if len(candidate) < 3:
+            print(f"rejecting {candidate}, lenght < 3")
+            return None
         matches = find_matches(candidate, self.word_dict)
 
         # If there is no match, try removing characters from the candidate and finding new matches
@@ -274,9 +276,10 @@ class Crossword:
     def _print_intersections(self):
         print()
         print("Current intersection set : ")
+        string = ""
         for item in self.intersections:
-            print(f"{item[0]},{item[1]},{item[2].value}")
-
+            string += f"{item[0]},{item[1]},{item[2].value} .... "
+        print(string)
 
     def print(self):
         """Print the crossword to the terminal"""
@@ -308,7 +311,7 @@ def main():
             else:
                 word_dict[length] = []
                 word_dict[length].append(word)
-    crossword = Crossword(8, 8, word_dict)
+    crossword = Crossword(15, 15, word_dict)
 
 def find_matches(word, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
@@ -316,6 +319,8 @@ def find_matches(word, word_dict):
     for i, char in enumerate(word):
         if char != '_':
             known_chars.append((i, char))
+    if len(word) not in word_dict.keys():
+        return []
     potential_matches = word_dict[len(word)]
     matches = []
     for potential_match in potential_matches:
