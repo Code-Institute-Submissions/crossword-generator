@@ -41,7 +41,7 @@ class Crossword:
                 self.print()
                 self._prune_intersection_set()
                 self._print_intersections()
-                input("Press enter to continue")
+                # input("Press enter to continue")
                 print('---------------------------------------------------------')
 
 
@@ -211,22 +211,29 @@ class Crossword:
         new_start_col = word.start_col
         new_start_row = word.start_row
         new_orientation = word.orientation.opposite()
+        
         if new_orientation == Orientation.VERTICAL:
+            end_col = word.start_col + len(word.string) - 1
             while new_start_col < self.cols:
                 cell_above_occupied = self._check_cell_occupied(new_start_row - 1, new_start_col)
                 cell_below_occupied = self._check_cell_occupied(new_start_row + 1, new_start_col)
                 if not cell_above_occupied and not cell_below_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
                     print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
-                new_start_col += 2
-        else:
+                new_start_col += 1
+                if new_start_col > end_col:
+                    break
+        elif new_orientation == Orientation.HORIZONTAL:
+            end_row = word.start_row + len(word.string) - 1
             while new_start_row < self.rows:
                 cell_to_left_occupied = self._check_cell_occupied(new_start_row, new_start_col - 1)
                 cell_to_right_occupied = self._check_cell_occupied(new_start_row, new_start_col + 1)
                 if not cell_to_left_occupied and not cell_to_right_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
                     print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
-                new_start_row += 2
+                new_start_row += 1
+                if new_start_row > end_row:
+                    break
 
     def _check_cell_occupied(self, row, col):
         """Checks if a cell has been filled with a letter or not. Interprets a cell outside the crossword
