@@ -11,12 +11,17 @@ class Word:
         self.start_col = col
 
 class Clue:
-    def __init__(self, string, orientation, definitions, start_row, start_col):
+    def __init__(self, string, index, orientation, definitions, start_row, start_col):
         self.string = string
+        self.index = index
         self.orientation = orientation
         self.definitions = definitions
         self.start_row = start_row
         self.start_col = start_col
+
+    def __str__(self):
+        output = f"{self.string} : {self.index} {self.orientation.value}\n{self.definitions}"
+        return output
 
 class Crossword:
     """Represents a crossword object"""
@@ -53,14 +58,21 @@ class Crossword:
             next_word = self._generate_new_word()
             if next_word is not None:
                 self.add_word_to_grid(next_word)
+                self.add_word_to_clues(next_word)
                 self.print()
                 self._prune_intersection_set()
                 self._print_intersections()
                 # input("Press enter to continue")
                 print('---------------------------------------------------------')
+        for clue in self.clues:
+            print()
+            print(clue)
 
     def add_word_to_clues(self, word):
-        
+        """Derive a clue from the word provided, and add it to the list of clues"""
+        definitions = self.word_dict[word.string][1]
+        clue = Clue(word.string, len(self.clues), word.orientation, definitions, word.start_row, word.start_col)
+        self.clues.append(clue)
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
