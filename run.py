@@ -11,11 +11,12 @@ class Word:
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, rows, cols, word_dict):
+    def __init__(self, rows, cols, dict_by_length, word_dict):
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
+        self.dict_by_length = dict_by_length
         self.intersections = set()
 
         # Generate a random crossword layout
@@ -28,7 +29,7 @@ class Crossword:
         blank_string = ''.join(blank_chars)
         print(f"{blank_string} (length = {len(blank_string)})")
         
-        matches = find_matches(blank_string, self.word_dict)
+        matches = find_matches(blank_string, self.dict_by_length, self.word_dict)
         choice = random.choice(matches)
         self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
         
@@ -37,12 +38,12 @@ class Crossword:
         while len(self.intersections) > 0:
             # Print the intersections_list to the terminal
             next_word = self._generate_new_word()
-            if next_word != None:
+            if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.print()
                 self._prune_intersection_set()
                 self._print_intersections()
-                # input("Press enter to continue")
+                input("Press enter to continue")
                 print('---------------------------------------------------------')
 
 
@@ -105,7 +106,7 @@ class Crossword:
         if len(candidate) < 3:
             print(f"rejecting {candidate}, lenght < 3")
             return None
-        matches = find_matches(candidate, self.word_dict)
+        matches = find_matches(candidate, self.dict_by_length, self.word_dict)
 
         # If there is no match, try removing characters from the candidate and finding new matches
         # If no shorter candidate is possible, return None and forget this intersection point
@@ -119,7 +120,7 @@ class Crossword:
                                         original_col)
             if shorter_candidate is None:
                 return None
-            matches = find_matches(shorter_candidate, self.word_dict)
+            matches = find_matches(shorter_candidate, self.dict_by_length, self.word_dict)
 
         choice = random.choice(matches)
         return Word(orientation, choice, root_row, root_col)
@@ -309,28 +310,29 @@ class Crossword:
 
 def main():
     """Main entry point for the program"""
-    word_dict = {}
+    dict_by_length = {}
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
-        json_obj = json.load(file)
-        for word in json_obj.keys():
+        word_dict = json.load(file)
+        for word in word_dict.keys():
             word = word.replace('\n', '')
             length = len(word)
-            if length in word_dict.keys():
-                word_dict[length].append(word)
+            if length in dict_by_length:
+                dict_by_length[length].append(word)
             else:
-                word_dict[length] = []
-                word_dict[length].append(word)
-    crossword = Crossword(15, 15, word_dict)
+                dict_by_length[length] = []
+                dict_by_length[length].append(word)
+    print(dict_by_length)
+    crossword = Crossword(15, 15, dict_by_length, word_dict)
 
-def find_matches(word, word_dict):
+def find_matches(word, dict_by_length, word_dict):
     """Searches the word_dict to find matches for the supplied word"""
     known_chars = []
     for i, char in enumerate(word):
         if char != '_':
             known_chars.append((i, char))
-    if len(word) not in word_dict.keys():
+    if len(word) not in dict_by_length.keys():
         return []
-    potential_matches = word_dict[len(word)]
+    potential_matches = dict_by_length[len(word)]
     matches = []
     for potential_match in potential_matches:
         match = True
@@ -340,6 +342,10 @@ def find_matches(word, word_dict):
                 match = False
         if match:
             matches.append(potential_match)
+
+    # Sort matches based on frequency (descending)
+    matches = sorted(matches, key = lambda match: word_dict[match][0], reverse=True)
+    print(matches)
     
     return matches
 
