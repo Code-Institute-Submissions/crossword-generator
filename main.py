@@ -6,7 +6,7 @@ def main():
        definitions as values"""
     word_list = load_large_dictionary()
     print(f"Word_list loaded with {len(word_list)} entries")
-    
+
     frequency_dict = load_word_frequencies()
     frequency_keys = frequency_dict.keys()
     print(f"Frequency dict loaded with {len(frequency_keys)} entries")
@@ -45,27 +45,6 @@ def main():
     with open('data/crossword_dictionary.json', 'x', encoding='utf-8') as outfile:
         outfile.write(json.dumps(word_dict, indent=4))
     
-
-def compare_dict_against_frequencies():
-    word_list = []
-    freq_list = []
-    with open('large_dict_words_only.txt', 'r', encoding='utf-8') as dictionary_file:
-        for line in dictionary_file:
-            word_list.append(line.replace('\n', ''))    
-    with open('wiki-words-freq100+.txt', 'r', encoding='utf-8') as frequency_file:
-        for line in frequency_file:
-            elements = line.split(' ')
-            word = elements[0]
-            freq_list.append(word)
-    counter = 0
-    matches = []
-    while counter < 10000:
-        if word_list[counter] in freq_list:
-            matches.append(word_list[counter])
-        counter += 1
-    print(matches)
-    print(len(matches))
-
 def load_word_frequencies():
     """Loads the wikipedia word frequency file and reads all the entries that
        have a frequency of more than 500, then saves these entries to a new
@@ -125,24 +104,6 @@ def load_large_dictionary():
         print("Skipping file creation - 'data/large_dictionary.txt' already exists")
 
     return word_list
-
-def find_matches(word, word_dict):
-    known_chars = []
-    for i, char in enumerate(word):
-        if char != '_':
-            known_chars.append((i, char))
-    potential_matches = word_dict[len(word)]
-    matches = []
-    for potential_match in potential_matches:
-        match = True
-        for char_tuple in known_chars:
-            index, char = char_tuple
-            if potential_match[index] != char:
-                match = False
-        if match:
-            matches.append(potential_match)
-    print(f"Words matching {word} : {matches}")
-
 
 if __name__ == '__main__':
     main()
