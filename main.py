@@ -70,7 +70,9 @@ def load_word_frequencies():
     return freq_dict
 
 def load_large_dictionary():
-    word_set = set()
+    """Loads the source dictionary and removes illegal words. Saves the
+       dictionary to a new file without including the part-of-speech"""
+    word_list = []
     with open('data/large_dictionary.txt', 'r', encoding='utf-8') as file:
         for line in file:
             # Separate out all the comma separated values
@@ -91,8 +93,8 @@ def load_large_dictionary():
             
             # Ensure that the words contain the letters a-z only
             if word[0].isalpha() and '-' not in word[0]:
-                word_set.add((word.lower(), definition))
-    word_list = sorted(word_set)
+                word_list.append((word.lower(), definition))
+    word_list.sort()
 
     # Write the sorted list of tuples to a new file. In order to avoid confusion,
     # use the pipe '|' instead of the comma ',' as separator.
