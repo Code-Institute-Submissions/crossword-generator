@@ -1,25 +1,38 @@
-def main():
-    word_dict = {}
+import json
 
-    load_large_dictionary()
+def main():
+
+    word_list = load_large_dictionary()
+    print(f"Word_list loaded with {len(word_list)} entries")
     
     frequency_list = load_word_frequencies()
     
-    # compare_dict_against_frequencies()
+    # Words in the word_list are often duplicated, with differing definitions.
+    # Create a dictionary with words as keys, and definitions as a list of
+    # values
+
+    word_dict = {}
+    previous_word = ""
+    total_count = 0
+    unique_count = 0
+    for item in word_list:
+        item_as_list = item.split('|')
+        if len(item_as_list) > 2:
+            print("Something odd - more than 2 values separated by '|'")
+        word = item_as_list[0]
+        definition = item_as_list[1]
+        if word != previous_word:
+            word_dict[word] = []
+            word_dict[word].append(definition)
+            unique_count += 1
+            total_count += 1
+        else:
+            word_dict[word].append(definition)
+            total_count += 1
+        previous_word = word
+
+    print(f"Dictionary created : {unique_count} unique, {total_count} total")
     
-    """ with open('large_dict_words_only.txt', 'r') as file:
-        for word in file:
-            word = word.replace('\n', '')
-            length = len(word)
-            if length in word_dict.keys():
-                word_dict[length].append(word)
-            else:
-                word_dict[length] = []
-                word_dict[length].append(word)
-    for key, value in word_dict.items():
-        print(f"Number of {key}-letter words is {len(value)}")
-    print(word_dict[6][0])
-    find_matches("abacus", word_dict) """
 
 def compare_dict_against_frequencies():
     word_list = []
@@ -55,9 +68,14 @@ def load_word_frequencies():
                 freq_tuple_list.append(freq_tuple)
             else: 
                 break
-    with open('data/wiki-words-freq500+.txt', 'w') as outfile:
-        for freq_tuple in freq_tuple_list:
-            outfile.writelines(f"{freq_tuple[0]} {freq_tuple[1]}\n")
+
+    try:
+        with open('data/wiki-words-freq500+.txt', 'x') as outfile:
+            for freq_tuple in freq_tuple_list:
+                outfile.writelines(f"{freq_tuple[0]} {freq_tuple[1]}\n")
+    except FileExistsError:
+        print("Skipping file creation - 'data/wiki-words-freq500+.txt' already exists")
+
     
     return freq_tuple_list
 
@@ -85,12 +103,15 @@ def load_large_dictionary():
     word_list = sorted(word_set)
 
     # Write the sorted list of tuples to a new file. In order to avoid confusion,
-    # use the pipe '|' instead of the comma ',' as separator. 
-    with open('data/large_dict_words_only.txt', 'w') as write_file:
-        for word in word_list:
-            write_file.writelines(f"{word[0]}|{word[1]}\n")
+    # use the pipe '|' instead of the comma ',' as separator.
+    try:
+        with open('data/large_dict_words_only.txt', 'x') as write_file:
+            for word in word_list:
+                write_file.writelines(f"{word[0]}|{word[1]}\n")
+    except FileExistsError:
+        print("Skipping file creation - 'data/large_dictionary.txt' already exists")
     
-    print(f"Word_list loaded with {len(word_list)} entries")
+    
 
     return word_list            
 
