@@ -1,5 +1,6 @@
 import random
 import json
+import math
 from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
 class Word:
@@ -18,6 +19,7 @@ class Crossword:
         self.word_dict = word_dict
         self.dict_by_length = dict_by_length
         self.intersections = set()
+        self.clues = []
 
         # Generate a random crossword layout
         self.generate_words()
@@ -25,13 +27,15 @@ class Crossword:
 
     def generate_words(self):
         """This function generates the words for the crossword"""
-        blank_chars = ['_' for i in range(self.cols)]
+        blank_chars = ['_' for i in range(random.randint(3, self.cols - 1))]
         blank_string = ''.join(blank_chars)
-        print(f"{blank_string} (length = {len(blank_string)})")
+        # print(f"{blank_string} (length = {len(blank_string)})")
         
         matches = find_matches(blank_string, self.dict_by_length, self.word_dict)
-        choice = random.choice(matches)
-        self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, 0, 0))
+        choice = matches[0]
+        random_row = random.randint(0, self.rows - 1)
+        self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, random_row, 0))
+        self.add_word_to_clues(choice)
         
         self.print()
 
@@ -43,9 +47,11 @@ class Crossword:
                 self.print()
                 self._prune_intersection_set()
                 self._print_intersections()
-                input("Press enter to continue")
+                # input("Press enter to continue")
                 print('---------------------------------------------------------')
 
+    def add_word_to_clues(self, word):
+        pass
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
@@ -58,7 +64,7 @@ class Crossword:
         (root_row, root_col, orientation) = root_cell
         original_row = root_row
         original_col = root_col
-        print(f"root_row == {root_row}, root_col == {root_col}")
+        # print(f"root_row == {root_row}, root_col == {root_col}")
         candidate = []
         candidate.append(self.grid[root_row][root_col])
         
@@ -102,9 +108,9 @@ class Crossword:
                     break
                 col -= 1
 
-        print(''.join(candidate))
+        # print(''.join(candidate))
         if len(candidate) < 3:
-            print(f"rejecting {candidate}, lenght < 3")
+            # print(f"rejecting {candidate}, lenght < 3")
             return None
         matches = find_matches(candidate, self.dict_by_length, self.word_dict)
 
@@ -122,7 +128,7 @@ class Crossword:
                 return None
             matches = find_matches(shorter_candidate, self.dict_by_length, self.word_dict)
 
-        choice = random.choice(matches)
+        choice = matches[0]
         return Word(orientation, choice, root_row, root_col)
 
     def _get_shorter_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
@@ -201,7 +207,7 @@ class Crossword:
         """Adds a word to the crossword grid in the correct orientation"""
 
         # Print the new word to the termimal
-        print(f"Word : {word.orientation.value}, string {word.string}, row {word.start_row}, col {word.start_col}")
+        # print(f"Word : {word.orientation.value}, string {word.string}, row {word.start_row}, col {word.start_col}")
 
         for i, _ in enumerate(word.string):
             if word.orientation == Orientation.HORIZONTAL:
@@ -221,7 +227,7 @@ class Crossword:
                 cell_below_occupied = self._check_cell_occupied(new_start_row + 1, new_start_col)
                 if not cell_above_occupied and not cell_below_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
-                    print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
+                    # print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
                 new_start_col += 1
                 if new_start_col > end_col:
                     break
@@ -232,7 +238,7 @@ class Crossword:
                 cell_to_right_occupied = self._check_cell_occupied(new_start_row, new_start_col + 1)
                 if not cell_to_left_occupied and not cell_to_right_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
-                    print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
+                    # print(f"Adding intersection ({new_start_row},{new_start_col},{new_orientation.value})")
                 new_start_row += 1
                 if new_start_row > end_row:
                     break
@@ -283,20 +289,20 @@ class Crossword:
         self.intersections = temp_set
 
     def _print_intersections(self):
-        print()
-        print("Current intersection set : ")
+        # print()
+        # print("Current intersection set : ")
         string = ""
         for item in self.intersections:
             string += f"{item[0]},{item[1]},{item[2].value} .... "
-        print(string)
+        # print(string)
 
     def print(self):
         """Print the crossword to the terminal"""
         light_gray = Colors.get_background_color(220, 220, 220)
         dark_gray = Colors.get_background_color(0, 0, 0)
         text_color = Colors.get_foreground_color(0, 0, 0)
-        print()
-        print("Here's the crossword : ")
+        # print()
+        # print("Here's the crossword : ")
         for row in self.grid:
             display_chars = []
             for char in row:
@@ -321,11 +327,13 @@ def main():
             else:
                 dict_by_length[length] = []
                 dict_by_length[length].append(word)
-    print(dict_by_length)
-    crossword = Crossword(15, 15, dict_by_length, word_dict)
+    # print(dict_by_length)
+    crossword = Crossword(11, 11, dict_by_length, word_dict)
 
 def find_matches(word, dict_by_length, word_dict):
-    """Searches the word_dict to find matches for the supplied word"""
+    """Searches the word_dict to find matches for the supplied word.
+       Returns the list of matches sorted in descending order of
+       frequency"""
     known_chars = []
     for i, char in enumerate(word):
         if char != '_':
@@ -345,7 +353,7 @@ def find_matches(word, dict_by_length, word_dict):
 
     # Sort matches based on frequency (descending)
     matches = sorted(matches, key = lambda match: word_dict[match][0], reverse=True)
-    print(matches)
+    # print(matches)
     
     return matches
 
