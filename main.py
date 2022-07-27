@@ -1,7 +1,7 @@
 def main():
     word_dict = {}
 
-    # load_large_dictionary()
+    load_large_dictionary()
     
     frequency_list = load_word_frequencies()
     
@@ -55,7 +55,7 @@ def load_word_frequencies():
                 freq_tuple_list.append(freq_tuple)
             else: 
                 break
-    with open('wiki-words-freq500+.txt', 'w') as outfile:
+    with open('data/wiki-words-freq500+.txt', 'w') as outfile:
         for freq_tuple in freq_tuple_list:
             outfile.writelines(f"{freq_tuple[0]} {freq_tuple[1]}\n")
     
@@ -63,18 +63,36 @@ def load_word_frequencies():
 
 def load_large_dictionary():
     word_set = set()
-    with open('large_dictionary.txt', 'r') as file:
+    with open('data/large_dictionary.txt', 'r') as file:
         for line in file:
-            comma_sep_value = line.split(',')[0]
+            # Separate out all the comma separated values
+            split_line = line.split(',')
+
+            # If a line has less than three elements after splitting,
+            # reject it
+            if len(split_line) < 3:
+                continue
+            comma_sep_value = split_line[0]
             word = comma_sep_value.split(' ')[0]
+
+            # Reassemble all the values after the first 2, as many of
+            # the definitions themselves contain commas!
+            definition = ','.join(split_line[2:])
+
+            # Ensure that the words contain the letters a-z only
             if word[0].isalpha() and '-' not in word[0]:
-                word_set.add(word.lower())
+                word_set.add((word.lower(), definition))
     word_list = sorted(word_set)
-    with open('large_dict_words_only.txt', 'w') as write_file:
+
+    # Write the sorted list of tuples to a new file. In order to avoid confusion,
+    # use the pipe '|' instead of the comma ',' as separator. 
+    with open('data/large_dict_words_only.txt', 'w') as write_file:
         for word in word_list:
-            write_file.writelines(word + '\n')
-    print(len(word_list))
-            
+            write_file.writelines(f"{word[0]}|{word[1]}\n")
+    
+    print(f"Word_list loaded with {len(word_list)} entries")
+
+    return word_list            
 
 def find_matches(word, word_dict):
     known_chars = []
