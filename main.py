@@ -1,7 +1,9 @@
 import json
 
 def main():
-
+    """Assembles the word list and the frequency list, and uses these to
+       create a dictionary keyed by word, with a list of frequency and
+       definitions as values"""
     word_list = load_large_dictionary()
     print(f"Word_list loaded with {len(word_list)} entries")
     
@@ -10,8 +12,8 @@ def main():
     print(f"Frequency dict loaded with {len(frequency_keys)} entries")
     
     # Words in the word_list are often duplicated, with differing definitions.
-    # Create a dictionary with words as keys, and definitions as a list of
-    # values
+    # Create a dictionary with words as keys, and a list (containing both the
+    # frequency of the word and a list of its definitions) as the value
 
     word_dict = {}
     previous_word = ""
@@ -21,31 +23,36 @@ def main():
     for item in word_list:
         word = item[0]
         definition = item[1]
+        if word not in frequency_keys:
+            not_in_freq_dict_count += 1
+            continue
         if word != previous_word:
             word_dict[word] = []
-            word_dict[word].append(definition)
+            frequency = frequency_dict[word]
+            word_dict[word].append(frequency)
+            word_dict[word].append([])
+            word_dict[word][1].append(definition)
             unique_count += 1
             total_count += 1
-            if word not in frequency_keys:
-                not_in_freq_dict_count += 1
-                # print(f"{word} not in frequency_dict")
+            
         else:
-            word_dict[word].append(definition)
+            word_dict[word][1].append(definition)
             total_count += 1
         previous_word = word
 
     print(f"Dictionary created : {unique_count} unique, {total_count} total, {not_in_freq_dict_count} not in frequency dict")
 
-    # print(json.dumps(word_dict, indent=2))
+    with open('data/crossword_dictionary.json', 'x', encoding='utf-8') as outfile:
+        outfile.write(json.dumps(word_dict, indent=4))
     
 
 def compare_dict_against_frequencies():
     word_list = []
     freq_list = []
-    with open('large_dict_words_only.txt', 'r') as dictionary_file:
+    with open('large_dict_words_only.txt', 'r', encoding='utf-8') as dictionary_file:
         for line in dictionary_file:
             word_list.append(line.replace('\n', ''))    
-    with open('wiki-words-freq100+.txt', 'r') as frequency_file:
+    with open('wiki-words-freq100+.txt', 'r', encoding='utf-8') as frequency_file:
         for line in frequency_file:
             elements = line.split(' ')
             word = elements[0]
@@ -64,28 +71,28 @@ def load_word_frequencies():
        have a frequency of more than 500, then saves these entries to a new
        file."""
     freq_dict = {}
-    with open('data/enwiki-20210820-words-frequency.txt', 'r') as infile:
+    with open('data/enwiki-20210820-words-frequency.txt', 'r', encoding='utf-8') as infile:
         for line in infile:
             elements = line.split(' ')
             frequency = int(elements[1].replace('\n', ''))
-            if frequency >= 50:
+            if frequency >= 1000:
                 freq_dict[elements[0]] = frequency
             else:
                 break
 
     try:
-        with open('data/wiki-words-freq50+.txt', 'x') as outfile:
+        with open('data/wiki-words-freq1000+.txt', 'x', encoding='utf-8') as outfile:
             for key, value in freq_dict.items():
                 outfile.writelines(f"{key} {value}\n")
     except FileExistsError:
-        print("Skipping file creation - 'data/wiki-words-freq50+.txt' already exists")
+        print("Skipping file creation - 'data/wiki-words-freq1000+.txt' already exists")
 
     
     return freq_dict
 
 def load_large_dictionary():
     word_set = set()
-    with open('data/large_dictionary.txt', 'r') as file:
+    with open('data/large_dictionary.txt', 'r', encoding='utf-8') as file:
         for line in file:
             # Separate out all the comma separated values
             split_line = line.split(',')
@@ -111,7 +118,7 @@ def load_large_dictionary():
     # Write the sorted list of tuples to a new file. In order to avoid confusion,
     # use the pipe '|' instead of the comma ',' as separator.
     try:
-        with open('data/large_dict_words_only.txt', 'x') as write_file:
+        with open('data/large_dict_words_only.txt', 'x', encoding='utf-8') as write_file:
             for word in word_list:
                 write_file.writelines(f"{word[0]}|{word[1]}\n")
     except FileExistsError:
