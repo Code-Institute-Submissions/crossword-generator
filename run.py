@@ -10,6 +10,14 @@ class Word:
         self.start_row = row
         self.start_col = col
 
+class Clue:
+    def __init__(self, string, orientation, definitions, start_row, start_col):
+        self.string = string
+        self.orientation = orientation
+        self.definitions = definitions
+        self.start_row = start_row
+        self.start_col = start_col
+
 class Crossword:
     """Represents a crossword object"""
     def __init__(self, rows, cols, dict_by_length, word_dict):
@@ -34,8 +42,9 @@ class Crossword:
         matches = find_matches(blank_string, self.dict_by_length, self.word_dict)
         choice = matches[0]
         random_row = random.randint(0, self.rows - 1)
-        self.add_word_to_grid(Word(Orientation.HORIZONTAL, choice, random_row, 0))
-        self.add_word_to_clues(choice)
+        first_word = Word(Orientation.HORIZONTAL, choice, random_row, 0)
+        self.add_word_to_grid(first_word)
+        self.add_word_to_clues(first_word)
         
         self.print()
 
@@ -51,7 +60,7 @@ class Crossword:
                 print('---------------------------------------------------------')
 
     def add_word_to_clues(self, word):
-        pass
+        
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""
