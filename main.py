@@ -1,8 +1,9 @@
 def main():
     word_dict = {}
+
     # load_large_dictionary()
     
-    # load_word_frequencies()
+    frequency_list = load_word_frequencies()
     
     # compare_dict_against_frequencies()
     
@@ -40,19 +41,25 @@ def compare_dict_against_frequencies():
     print(matches)
     print(len(matches))
 
-
 def load_word_frequencies():
+    """Loads the wikipedia word frequency file and reads all the entries that
+       have a frequency of more than 500, then saves these entries to a new
+       file."""
     freq_tuple_list = []
-    with open('enwiki-20210820-words-frequency.txt', 'r') as infile:
+    with open('data/enwiki-20210820-words-frequency.txt', 'r') as infile:
         for line in infile:
             elements = line.split(' ')
             frequency = int(elements[1].replace('\n', ''))
-            if (frequency >= 100):
+            if frequency >= 500:
                 freq_tuple = (elements[0], frequency)
                 freq_tuple_list.append(freq_tuple)
-    with open('wiki-words-freq100+.txt', 'w') as outfile:
+            else: 
+                break
+    with open('wiki-words-freq500+.txt', 'w') as outfile:
         for freq_tuple in freq_tuple_list:
             outfile.writelines(f"{freq_tuple[0]} {freq_tuple[1]}\n")
+    
+    return freq_tuple_list
 
 def load_large_dictionary():
     word_set = set()
