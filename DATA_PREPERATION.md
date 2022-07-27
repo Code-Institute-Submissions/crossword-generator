@@ -15,5 +15,7 @@ Finally, I found and downloaded a list of all the words found on Wikipedia, list
 ## Preparation
 
 ### Cleaning the data
-- All words with a frequency of more than 500 were loaded from the wikipedia word frequency file, and saved to another file 'data/wiki-words-freq500+.txt'
-- 
+- All words with a frequency of more than 1000 were loaded from the wikipedia word frequency file, and saved to another file 'data/wiki-words-freq1000+.txt'
+- Words and their definitions were loaded from the source file 'large_dictionary.txt' and saved without the part-of-speech specifier, then returned as a list of tuples - each tuple contains the word, and the definition.
+- As words in this list are repeated with differing definitions, a python dictionary was created with words as keys. The value associated with each key is a list, which has 2 elements. The first is the frequency with which the word occurs (on Wikipedia), and the second is a further list of the definitions
+- This dictionary is then saved to a file in json format. This file is accessed by the crossword generator when creating a new crossword

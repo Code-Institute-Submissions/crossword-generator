@@ -42,8 +42,11 @@ def main():
 
     print(f"Dictionary created : {unique_count} unique, {total_count} total, {not_in_freq_dict_count} not in frequency dict")
 
-    with open('data/crossword_dictionary.json', 'x', encoding='utf-8') as outfile:
-        outfile.write(json.dumps(word_dict, indent=4))
+    try:
+        with open('data/crossword_dictionary.json', 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(word_dict, indent=4))
+    except FileExistsError:
+        print("Skipping file creation - 'data/crossword_dictionary.json' already exists")
     
 def load_word_frequencies():
     """Loads the wikipedia word frequency file and reads all the entries that
@@ -82,8 +85,9 @@ def load_large_dictionary():
             # reject it
             if len(split_line) < 3:
                 continue
-            comma_sep_value = split_line[0]
-            word = comma_sep_value.split(' ')[0]
+            word = split_line[0]
+            if ' ' in word:
+                continue
 
             # Reassemble all the values after the first 2, as many of
             # the definitions themselves contain commas!
@@ -92,14 +96,15 @@ def load_large_dictionary():
             definition = definition.replace('\n', '')
             
             # Ensure that the words contain the letters a-z only
-            if word[0].isalpha() and '-' not in word[0]:
+            if word.isalpha() and '-' not in word and "\'" not in word:
                 word_list.append((word.lower(), definition))
+
     word_list.sort()
 
     # Write the sorted list of tuples to a new file. In order to avoid confusion,
     # use the pipe '|' instead of the comma ',' as separator.
     try:
-        with open('data/large_dict_words_only.txt', 'x', encoding='utf-8') as write_file:
+        with open('data/large_dict_words_only.txt', 'w', encoding='utf-8') as write_file:
             for word in word_list:
                 write_file.writelines(f"{word[0]}|{word[1]}\n")
     except FileExistsError:

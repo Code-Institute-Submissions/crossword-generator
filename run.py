@@ -1,4 +1,5 @@
 import random
+import json
 from constants import Orientation, get_large_letter, Colors, UniChars, AnsiCommands
 
 class Word:
@@ -309,8 +310,9 @@ class Crossword:
 def main():
     """Main entry point for the program"""
     word_dict = {}
-    with open('data/large_dict_words_only.txt', 'r') as file:
-        for word in file:
+    with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
+        json_obj = json.load(file)
+        for word in json_obj.keys():
             word = word.replace('\n', '')
             length = len(word)
             if length in word_dict.keys():
