@@ -309,7 +309,7 @@ class Crossword:
 def main():
     """Main entry point for the program"""
     word_dict = {}
-    with open('data/10000-words.txt', 'r') as file:
+    with open('data/large_dict_words_only.txt', 'r') as file:
         for word in file:
             word = word.replace('\n', '')
             length = len(word)

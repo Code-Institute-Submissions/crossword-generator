@@ -60,7 +60,7 @@ def load_large_dictionary():
         for line in file:
             comma_sep_value = line.split(',')[0]
             word = comma_sep_value.split(' ')[0]
-            if word[0].isalpha():
+            if word[0].isalpha() and '-' not in word[0]:
                 word_set.add(word.lower())
     word_list = sorted(word_set)
     with open('large_dict_words_only.txt', 'w') as write_file:
