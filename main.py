@@ -76,6 +76,8 @@ def load_large_dictionary():
     """Loads the source dictionary and removes illegal words. Saves the
        dictionary to a new file without including the part-of-speech"""
     word_list = []
+    of_count = 0
+    contains_word_count = 0
     with open('data/large_dictionary.txt', 'r', encoding='utf-8') as file:
         for line in file:
             # Separate out all the comma separated values
@@ -94,6 +96,20 @@ def load_large_dictionary():
             definition = ','.join(split_line[2:])
             definition = definition.replace('"', '')
             definition = definition.replace('\n', '')
+
+            # Exclude all definitions that start with 'of' - these simply refer
+            # to a base entry in the dictionary for a different part of speech
+            if definition.lower().startswith("of"):
+                print(f"Invalid (starts with of) {definition}")
+                of_count += 1
+                continue
+
+            # Exclude all definitions that contain the word itself - These result 
+            # in pretty easy clues!
+            if word.lower() in definition.lower():
+                print(f"Invalid (contains word itself) : ({word}) {definition}")
+                contains_word_count += 1
+                continue
             
             # Ensure that the words contain the letters a-z only
             if word.isalpha() and '-' not in word and "\'" not in word:
@@ -109,6 +125,9 @@ def load_large_dictionary():
                 write_file.writelines(f"{word[0]}|{word[1]}\n")
     except FileExistsError:
         print("Skipping file creation - 'data/large_dictionary.txt' already exists")
+
+    print(f"Of exclusions : {of_count}")
+    print(f"Contains word exclusions : {contains_word_count}")
 
     return word_list
 
