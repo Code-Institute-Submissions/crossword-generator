@@ -38,7 +38,7 @@ class Crossword:
         self.clues = []
 
         # A set is used to prevent duplicate intersections
-        self.intersections = set(
+        self.intersections = set()
         
         # Generate a random crossword layout
         self.generate_words()
