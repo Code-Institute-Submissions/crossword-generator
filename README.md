@@ -34,6 +34,10 @@ An object-oriented approach was employed for the process of crossword generation
 
 ## Execution Paths
 
+![flowchart for crossword generation](documentation_images/crossword_generation.png)
+
+![flowchart for puzzle solver](documentation_images/Crossword%20puzzle%20flow.png)
+
 ## Testing
 ### Manual Testing
 ### Automated Testing
