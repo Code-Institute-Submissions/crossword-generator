@@ -243,6 +243,12 @@ class Crossword:
             else:
                 self.grid[word.start_row + i][word.start_col] = word.string[i]
 
+        # Remove the word from the dict_by_length dictionary so that it cannot
+        # appear twice. This prevents it appearing again in any crossword created
+        # in this instance of the program.
+        key = len(word.string)
+        self.dict_by_length[key].remove(word.string)
+
         # Calculate the new intersections on this word
         new_start_col = word.start_col
         new_start_row = word.start_row
