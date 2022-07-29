@@ -350,6 +350,7 @@ def main():
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
         word_dict = json.load(file)
         for word in word_dict.keys():
+            print(type(word))
             word = word.replace('\n', '')
             length = len(word)
             if length in dict_by_length:
