@@ -10,7 +10,8 @@ class Crossword:
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
         self.dict_by_length = dict_by_length
-        self.clues = []
+        self.clues_across = []
+        self.clues_down = []
 
         # A set is used to prevent duplicate intersections
         self.intersections = set()
@@ -48,15 +49,22 @@ class Crossword:
                 # self._print_intersections()
                 # input("Press enter to continue")
                 print('---------------------------------------------------------')
-        for clue in self.clues:
+        for clue in self.clues_across:
+            print()
+            print(clue)
+        for clue in self.clues_down:
             print()
             print(clue)
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
         definitions = self.word_dict[word.string][1]
-        clue = Clue(word.string, len(self.clues), word.orientation, definitions, word.start_row, word.start_col)
-        self.clues.append(clue)
+        if word.orientation == Orientation.HORIZONTAL:
+            clue = Clue(word.string, len(self.clues_across), word.orientation, definitions, word.start_row, word.start_col)
+            self.clues_across.append(clue)
+        else:
+            clue = Clue(word.string, len(self.clues_down), word.orientation, definitions, word.start_row, word.start_col)
+            self.clues_down.append(clue)
 
     def _generate_new_word(self):
         """Generates one new word in the crossword, if possible"""

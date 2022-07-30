@@ -1,3 +1,5 @@
+from constants import Colors
+
 class Word:
     """Represents a word in the crossword puzzle. Specifies the word string, 
        the starting row and column, and the orientation (down or across)"""
@@ -49,3 +51,15 @@ def find_matches(word, dict_by_length, word_dict):
     # print(matches)
     
     return matches
+
+def get_move_cursor_string(x, y):
+    """Returns a string that when printed will move the cursor to
+       the x and y coordinates provided"""
+    return f"\x1b[{y};{x}H"
+
+def get_alternating_sqaure_color(x, y):
+    """Returns alternating colours for odd and even numbered coordinates"""
+    if x % 2 == y % 2:
+        return Colors.get_background_color(200, 200, 200)
+    else:
+        return Colors.get_background_color(230, 230, 230)

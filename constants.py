@@ -21,6 +21,7 @@ class UniChars(str, enum.Enum):
     STAR = "\u2605"
     SUPERSCRIPT = "x\u2077"
     EMPTY_SQUARE = "\u2B1C"
+    
 
 class Colors(str, enum.Enum):
     """
@@ -33,6 +34,7 @@ class Colors(str, enum.Enum):
     FOREGROUND_PURPLE = "\x1b[38;5;13m"
     FOREGROUND_ORANGE = "\x1b[38;5;208m"
     FOREGROUND_RED = "\x1b[38;5;9m"
+    
 
     @staticmethod
     def random():
@@ -67,6 +69,7 @@ class AnsiCommands(str, enum.Enum):
     TERMINAL_BELL = f"\a"
     CLEAR_SCREEN = f"\x1b[2J"
     CLEAR_LINE = f"\x1b[2K"
+    CLEAR_BUFFER = f"\x1b[3J"
     CURSOR_TO_HOME = f"\x1b[H"
     CURSOR_UP_ONE_LINE = f"\x1b[1A"
     INVERSE_COLOR = f"\x1b[7m"
