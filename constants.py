@@ -19,8 +19,42 @@ class UniChars(str, enum.Enum):
     HORIZONTAL_LINE = "\u2500"
     LEFT_ARROW = "\u27F5"
     STAR = "\u2605"
-    SUPERSCRIPT = "x\u2077"
+    SUPERSCRIPT = [
+        '\u00B9',
+        '\u00B2',
+        '\u00B3',
+        '\u2074',
+        '\u2075',
+        '\u2076',
+        '\u2077',
+        '\u2078',
+        '\u2079',
+    ]
     EMPTY_SQUARE = "\u2B1C"
+
+    @staticmethod
+    def superscript(index):
+        """Get a superscript character for this number"""
+        if index == 1:
+            return '\u00B9'
+        elif index == 2:
+            return '\u00B2'
+        elif index == 3:
+            return '\u00B3'
+        elif index == 4:
+            return '\u2074'
+        elif index == 5:
+            return '\u2075'
+        elif index == 6:
+            return '\u2076'
+        elif index == 7:
+            return '\u2077'
+        elif index == 8:
+            return '\u2078'
+        elif index == 9:
+            return '\u2079'
+        elif index == 0:
+            return '\u2070'
     
 
 class Colors(str, enum.Enum):

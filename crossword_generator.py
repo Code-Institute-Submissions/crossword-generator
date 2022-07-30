@@ -60,10 +60,10 @@ class Crossword:
         """Derive a clue from the word provided, and add it to the list of clues"""
         definitions = self.word_dict[word.string][1]
         if word.orientation == Orientation.HORIZONTAL:
-            clue = Clue(word.string, len(self.clues_across), word.orientation, definitions, word.start_row, word.start_col)
+            clue = Clue(word.string, len(self.clues_across) + 1, word.orientation, definitions, word.start_row, word.start_col)
             self.clues_across.append(clue)
         else:
-            clue = Clue(word.string, len(self.clues_down), word.orientation, definitions, word.start_row, word.start_col)
+            clue = Clue(word.string, len(self.clues_down) + 1, word.orientation, definitions, word.start_row, word.start_col)
             self.clues_down.append(clue)
 
     def _generate_new_word(self):
