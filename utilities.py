@@ -1,5 +1,5 @@
-from yaml import AnchorToken
 from constants import AnsiCommands, Colors, UniChars
+import sys
 
 class Word:
     """Represents a word in the crossword puzzle. Specifies the word string, 
@@ -58,7 +58,7 @@ def get_move_cursor_string(x, y):
        the x and y coordinates provided"""
     return f"\x1b[{y};{x}H"
 
-def get_alternating_sqaure_color(x, y):
+def get_alternating_square_color(x, y):
     """Returns alternating colours for odd and even numbered coordinates"""
     if x % 2 == y % 2:
         return Colors.get_background_color(200, 200, 200)
@@ -68,9 +68,11 @@ def get_alternating_sqaure_color(x, y):
 def draw_string(string, x_pos, y_pos, colors):
     """Prints a string to the terminal at a given position, using a given list of colors"""
     string_builder = []
-    string_builder.append(f"{get_move_cursor_string(x_pos, y_pos)}")
+    string_builder.append(get_move_cursor_string(x_pos, y_pos))
     for color in colors:
         string_builder.append(color)
     string_builder.append(string)
     string_builder.append(AnsiCommands.DEFAULT_COLOR)
+    result = ''.join(string_builder)
+    sys.stdout.write(result)
 

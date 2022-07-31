@@ -1,7 +1,7 @@
 import sys
 import json
 from crossword_generator import Crossword
-from utilities import draw_string, get_move_cursor_string, get_alternating_sqaure_color
+from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
 from constants import AnsiCommands, Colors, UniChars, Orientation
 
 TERMINAL_WIDTH = 80
@@ -40,7 +40,7 @@ def begin_puzzle(crossword):
         print()
         input_y_pos = TERMINAL_HEIGHT - 2
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
-        command = input('Enter a command :')
+        command = input('Enter a command : ')
         if command != '':
             result = parse_command(command, crossword)
             sys.stdout.write(get_move_cursor_string(0, TERMINAL_HEIGHT - 1))
@@ -55,7 +55,7 @@ def begin_puzzle(crossword):
             elif displayed == 'clues':
                 displayed = 'crossword'
                 display_crossword(crossword)
-                highlight_single_clue(crossword)
+                highlight_single_clue(crossword, True)
             
 
 def display_crossword(crossword):
@@ -72,7 +72,7 @@ def display_crossword(crossword):
                 sys.stdout.write(f"{DARK_GRAY}  {AnsiCommands.DEFAULT_COLOR}")
             else:
                 char = crossword.grid[i][j].upper()
-                color = get_alternating_sqaure_color(i, j)
+                color = get_alternating_square_color(i, j)
                 output = f"{color}{TEXT_COLOR}  {AnsiCommands.DEFAULT_COLOR}"
                 sys.stdout.write(output)
     sys.stdout.flush()
@@ -86,7 +86,7 @@ def display_crossword(crossword):
                 sys.stdout.write(f"{DARK_GRAY}  {AnsiCommands.DEFAULT_COLOR}")
             else:
                 char = crossword.grid[i][j].upper()
-                color = get_alternating_sqaure_color(i, j)
+                color = get_alternating_square_color(i, j)
                 output = f"{color}{TEXT_COLOR}  {AnsiCommands.DEFAULT_COLOR}"
                 sys.stdout.write(output)
     sys.stdout.flush()
@@ -104,7 +104,7 @@ def display_crossword(crossword):
         row = START_ROW + clue.start_row
         col = START_COL + clue.start_col
         sys.stdout.write(get_move_cursor_string((col - 1) * 2, row))
-        color = get_alternating_sqaure_color(row, col)
+        color = get_alternating_square_color(row, col)
         sys.stdout.write(f"{color}")
         sys.stdout.write(f"{first_digit}{second_digit}")
 
@@ -120,7 +120,7 @@ def display_crossword(crossword):
         row = START_ROW + clue.start_row
         col = START_COL + clue.start_col
         sys.stdout.write(get_move_cursor_string((col - 1) * 2, row))
-        color = get_alternating_sqaure_color(row, col)
+        color = get_alternating_square_color(row, col)
         sys.stdout.write(f"{color}")
         sys.stdout.write(f"{first_digit}{second_digit}")
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
@@ -140,27 +140,37 @@ def display_clues(crossword):
         print(f"({clue.index} {clue.orientation.value}) {clue.definitions[0]}")
 
 def highlight_single_clue(crossword, highlighted=True):
-    """Highlight the position of one clue on the crossword puzzle, and print 
+    """Highlight the position of one clue on the crossword puzzle, and print
        that clue below the crossword"""
     clue = crossword.selected_clue
-    x_coord = START_COL + clue.start_col
+    x_coord = START_COL + clue.start_col * 2
     y_coord = START_ROW + clue.start_row
-    back = Colors.BACKGROUND_CYAN if highlighted else AnsiCommands.DEFAULT_COLOR
+    alt_color = get_alternating_square_color(clue.start_col, clue.start_row)
+    back = Colors.BACKGROUND_CYAN if highlighted else alt_color
     fore = Colors.FOREGROUND_BLUE if highlighted else AnsiCommands.DEFAULT_COLOR
-    draw_string("  ", x_coord, y_coord, back)
+    draw_string("  ", x_coord, y_coord, [back, fore])
+    first_digit = ''
+    second_digit = ''
+    if clue.index <= 9:
+        first_digit = UniChars.superscript(clue.index)
+    else:
+        first_digit = UniChars.superscript(int(clue.index / 10))
+        second_digit = UniChars.superscript(clue.index % 10)
     draw_string(
-        UniChars.superscript(clue.index),
+        f"{first_digit}{second_digit}",
         x_coord,
         y_coord,
         [back, fore])
     if clue.orientation == Orientation.HORIZONTAL:
         for offset in range(1, len(clue.string)):
-            sys.stdout.write(get_move_cursor_string(x_coord + offset * 2, y_coord))
-            sys.stdout.write("  ")
+            alt_color = get_alternating_square_color(offset, clue.start_row)
+            back = Colors.BACKGROUND_CYAN if highlighted else alt_color
+            draw_string("  ", x_coord + offset * 2, y_coord, [fore, back])
     elif clue.orientation == Orientation.VERTICAL:
         for offset in range(1, len(clue.string)):
-            sys.stdout.write(get_move_cursor_string(x_coord, y_coord + offset * 2))
-            sys.stdout.write("  ")
+            alt_color = get_alternating_square_color(clue.start_col, offset)
+            back = Colors.BACKGROUND_CYAN if highlighted else alt_color
+            draw_string("  ", x_coord, y_coord + offset, [back, fore])
     
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.write(AnsiCommands.BOLD)
@@ -183,12 +193,20 @@ def parse_command(command, crossword):
         # Check if this is a valic reference to a clue
         if elements[1].lower() == 'd' or elements[1].lower() == 'down':
             if crossword.has_clue(index, Orientation.VERTICAL):
-                return f"Clue {elements[0]} Down exists!"
+                new_clue = crossword.get_clue(index, Orientation.VERTICAL)
+                highlight_single_clue(crossword, False)
+                crossword.selected_clue = new_clue
+                highlight_single_clue(crossword)
+                return f"Clue is now {index} Down"
             else:
                 return 'No clue matches that!'
         elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
             if crossword.has_clue(index, Orientation.HORIZONTAL):
-                return f"Clue {elements[0]} Across exists!"
+                new_clue = crossword.get_clue(index, Orientation.HORIZONTAL)
+                highlight_single_clue(crossword, False)
+                crossword.selected_clue = new_clue
+                highlight_single_clue(crossword)
+                return f"Clue is now {index} Across"
             else:
                 return 'No clue matches that!'
         else:
