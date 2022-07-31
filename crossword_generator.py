@@ -12,12 +12,14 @@ class Crossword:
         self.dict_by_length = dict_by_length
         self.clues_across = []
         self.clues_down = []
+        self.selected_clue = None
 
         # A set is used to prevent duplicate intersections
         self.intersections = set()
         
         # Generate a random crossword layout
         self.generate_words()
+        self.selected_clue = self.clues_across[0]
         self.print()
 
     def generate_words(self):

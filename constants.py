@@ -68,6 +68,8 @@ class Colors(str, enum.Enum):
     FOREGROUND_PURPLE = "\x1b[38;5;13m"
     FOREGROUND_ORANGE = "\x1b[38;5;208m"
     FOREGROUND_RED = "\x1b[38;5;9m"
+
+    BACKGROUND_CYAN = "\x1b[48;5;14m"
     
 
     @staticmethod
@@ -110,6 +112,7 @@ class AnsiCommands(str, enum.Enum):
     BLINK = "\x1b[5m"
     NORMAL = "\x1b[0m"
     FAINT = "\x1b[2m"
+    BOLD = "\x1b[1m"
     DEFAULT_COLOR = "\x1b[00m"
 
 class Orientation (enum.Enum):
