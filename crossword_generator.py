@@ -325,6 +325,20 @@ class Crossword:
                     clue_exists = True
         return clue_exists
 
+    def get_clue(self, index, orientation):
+        """Gets a clue from one of the lists of clues based on index and 
+           orientation"""
+        requested_clue = None
+        if orientation == Orientation.HORIZONTAL:
+            for clue in self.clues_across:
+                if clue.index == index:
+                    requested_clue = clue
+        elif orientation == Orientation.VERTICAL:
+            for clue in self.clues_down:
+                if clue.index == index:
+                    requested_clue = clue
+        return requested_clue
+        
     def print(self):
         """Print the crossword to the terminal"""
         light_gray = Colors.get_background_color(220, 220, 220)

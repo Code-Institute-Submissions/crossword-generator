@@ -1,7 +1,7 @@
 import sys
 import json
 from crossword_generator import Crossword
-from utilities import get_move_cursor_string, get_alternating_sqaure_color
+from utilities import draw_string, get_move_cursor_string, get_alternating_sqaure_color
 from constants import AnsiCommands, Colors, UniChars, Orientation
 
 TERMINAL_WIDTH = 80
@@ -139,18 +139,20 @@ def display_clues(crossword):
     for clue in crossword.clues_down:
         print(f"({clue.index} {clue.orientation.value}) {clue.definitions[0]}")
 
-def highlight_single_clue(crossword):
+def highlight_single_clue(crossword, highlighted=True):
     """Highlight the position of one clue on the crossword puzzle, and print 
        that clue below the crossword"""
     clue = crossword.selected_clue
     x_coord = START_COL + clue.start_col
     y_coord = START_ROW + clue.start_row
-    sys.stdout.write(Colors.BACKGROUND_CYAN)
-    sys.stdout.write(Colors.FOREGROUND_BLUE)
-    sys.stdout.write(get_move_cursor_string(x_coord, y_coord))
-    sys.stdout.write("  ")
-    sys.stdout.write(get_move_cursor_string(x_coord, y_coord))
-    sys.stdout.write(UniChars.superscript(clue.index))
+    back = Colors.BACKGROUND_CYAN if highlighted else AnsiCommands.DEFAULT_COLOR
+    fore = Colors.FOREGROUND_BLUE if highlighted else AnsiCommands.DEFAULT_COLOR
+    draw_string("  ", x_coord, y_coord, back)
+    draw_string(
+        UniChars.superscript(clue.index),
+        x_coord,
+        y_coord,
+        [back, fore])
     if clue.orientation == Orientation.HORIZONTAL:
         for offset in range(1, len(clue.string)):
             sys.stdout.write(get_move_cursor_string(x_coord + offset * 2, y_coord))

@@ -20,7 +20,7 @@ class Clue:
         self.orientation = orientation
         self.definitions = definitions
         self.start_row = start_row
-        self.start_col = start_co
+        self.start_col = start_col
 
     def __str__(self):
         output = f"{self.string} : {self.index} {self.orientation.value}\n{self.definitions}"
