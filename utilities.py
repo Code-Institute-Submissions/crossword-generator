@@ -1,4 +1,5 @@
-from constants import Colors
+from yaml import AnchorToken
+from constants import AnsiCommands, Colors, UniChars
 
 class Word:
     """Represents a word in the crossword puzzle. Specifies the word string, 
@@ -19,7 +20,7 @@ class Clue:
         self.orientation = orientation
         self.definitions = definitions
         self.start_row = start_row
-        self.start_col = start_col
+        self.start_col = start_co
 
     def __str__(self):
         output = f"{self.string} : {self.index} {self.orientation.value}\n{self.definitions}"
@@ -63,3 +64,13 @@ def get_alternating_sqaure_color(x, y):
         return Colors.get_background_color(200, 200, 200)
     else:
         return Colors.get_background_color(230, 230, 230)
+
+def draw_string(string, x_pos, y_pos, colors):
+    """Prints a string to the terminal at a given position, using a given list of colors"""
+    string_builder = []
+    string_builder.append(f"{get_move_cursor_string(x_pos, y_pos)}")
+    for color in colors:
+        string_builder.append(color)
+    string_builder.append(string)
+    string_builder.append(AnsiCommands.DEFAULT_COLOR)
+
