@@ -311,6 +311,18 @@ class Crossword:
             string += f"{item[0]},{item[1]},{item[2].value} .... "
         # print(string)
 
+    def has_clue(self, index, orientation):
+        clue_exists = False
+        if orientation == Orientation.HORIZONTAL:
+            for clue in self.clues_across:
+                if clue.index == index:
+                    clue_exists = True
+        elif orientation == Orientation.VERTICAL:
+            for clue in self.clues_down:
+                if clue.index == index:
+                    clue_exists = True
+        return clue_exists
+
     def print(self):
         """Print the crossword to the terminal"""
         light_gray = Colors.get_background_color(220, 220, 220)

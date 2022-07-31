@@ -40,7 +40,9 @@ def begin_puzzle(crossword):
         print()
         input_y_pos = TERMINAL_HEIGHT - 1
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
-        input('Enter a command :')
+        command = input('Enter a command :')
+        if command != '':
+            parse_command(command)
         if displayed == 'crossword':
             displayed = 'clues'
             display_clues(crossword)
