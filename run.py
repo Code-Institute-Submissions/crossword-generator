@@ -38,18 +38,24 @@ def begin_puzzle(crossword):
 
     while True:
         print()
-        input_y_pos = TERMINAL_HEIGHT - 1
+        input_y_pos = TERMINAL_HEIGHT - 2
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
         command = input('Enter a command :')
         if command != '':
-            parse_command(command)
-        if displayed == 'crossword':
-            displayed = 'clues'
-            display_clues(crossword)
-        elif displayed == 'clues':
-            displayed = 'crossword'
-            display_crossword(crossword)
-            highlight_single_clue(crossword)
+            result = parse_command(command, crossword)
+            sys.stdout.write(get_move_cursor_string(0, TERMINAL_HEIGHT - 1))
+            sys.stdout.write(Colors.FOREGROUND_RED)
+            sys.stdout.write(result)
+            sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
+            sys.stdout.flush()
+        else :
+            if displayed == 'crossword':
+                displayed = 'clues'
+                display_clues(crossword)
+            elif displayed == 'clues':
+                displayed = 'crossword'
+                display_crossword(crossword)
+                highlight_single_clue(crossword)
             
 
 def display_crossword(crossword):
@@ -165,7 +171,35 @@ def highlight_single_clue(crossword):
     
     sys.stdout.flush()
 
-
+def parse_command(command, crossword):
+    """Parse a command entered by the user. This can be either a request
+       to display a different clue, or a solution to the clue currently
+       displayed"""
+    elements = command.split(' ')
+    if elements[0].isnumeric():
+        index = int(elements[0])
+        # Check if this is a valic reference to a clue
+        if elements[1].lower() == 'd' or elements[1].lower() == 'down':
+            if crossword.has_clue(index, Orientation.VERTICAL):
+                return f"Clue {elements[0]} Down exists!"
+            else:
+                return 'No clue matches that!'
+        elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
+            if crossword.has_clue(index, Orientation.HORIZONTAL):
+                return f"Clue {elements[0]} Across exists!"
+            else:
+                return 'No clue matches that!'
+        else:
+            return 'No such clue!'
+    else:
+        # Check if command is a valid solution to the current clue
+        # First ensure the command consists entirely of letters
+        if not command.isalpha():
+            return 'Solutions can only contain letters!'
+        # Next check if the command is the correct lenght
+        if len(command) != len(crossword.selected_clue.string):
+            return f"Wrong length! Length of solution should be {len(crossword.selected_clue.string)}"
+        return f"Your guess is '{command}'"
 
 if __name__ == '__main__':
     main()

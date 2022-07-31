@@ -312,6 +312,8 @@ class Crossword:
         # print(string)
 
     def has_clue(self, index, orientation):
+        """Returns true if a clue with the supplied index and orientation
+           exists in the crossword"""
         clue_exists = False
         if orientation == Orientation.HORIZONTAL:
             for clue in self.clues_across:
