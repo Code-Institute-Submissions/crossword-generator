@@ -2,7 +2,7 @@ import sys
 import json
 from crossword_generator import Crossword
 from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
-from constants import AnsiCommands, Colors, UniChars, Orientation
+from constants import AnsiCommands, Colors, UniChars, Orientation, get_large_letter
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24
@@ -58,7 +58,7 @@ def begin_puzzle(crossword):
             elif displayed == 'clues':
                 displayed = 'crossword'
                 display_crossword(crossword)
-                highlight_single_clue(crossword, True)
+                highlight_single_clue(crossword)
 
 def display_crossword(crossword):
     """Print the crossword to the screen"""
@@ -80,16 +80,21 @@ def display_crossword(crossword):
     sys.stdout.flush()
 
     right_col = 6 + crossword.cols * 2
-    for i, row in enumerate(crossword.grid):
+    for i, row in enumerate(crossword.user_guesses):
         sys.stdout.write(get_move_cursor_string(right_col, START_ROW + i))
         sys.stdout.flush()
         for j, col in enumerate(row):
-            if crossword.grid[i][j] == '_':
+            if crossword.user_guesses[i][j] == '_':
                 sys.stdout.write(f"{DARK_GRAY}  {AnsiCommands.DEFAULT_COLOR}")
             else:
-                char = crossword.grid[i][j].upper()
+                user_guess = crossword.user_guesses[i][j]
+                char = None
+                if user_guess == '*':
+                    char = '  '
+                else:
+                    char = get_large_letter(user_guess)
                 color = get_alternating_square_color(i, j)
-                output = f"{color}{TEXT_COLOR}  {AnsiCommands.DEFAULT_COLOR}"
+                output = f"{color}{TEXT_COLOR}{char}{AnsiCommands.DEFAULT_COLOR}"
                 sys.stdout.write(output)
     sys.stdout.flush()
 

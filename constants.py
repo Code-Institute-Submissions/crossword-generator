@@ -68,7 +68,7 @@ class Colors(str, enum.Enum):
     FOREGROUND_PURPLE = "\x1b[38;5;13m"
     FOREGROUND_ORANGE = "\x1b[38;5;208m"
     FOREGROUND_RED = "\x1b[38;5;9m"
-
+    FOREGROUND_BLACK = "\x1b[38;5;0m"
     BACKGROUND_CYAN = "\x1b[48;5;14m"
     
 

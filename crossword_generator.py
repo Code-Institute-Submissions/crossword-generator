@@ -8,6 +8,7 @@ class Crossword:
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
+        self.user_guesses = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
         self.dict_by_length = dict_by_length
         self.clues_across = []
@@ -225,8 +226,10 @@ class Crossword:
         for i, _ in enumerate(word.string):
             if word.orientation == Orientation.HORIZONTAL:
                 self.grid[word.start_row][word.start_col + i] = word.string[i]
+                self.user_guesses[word.start_row][word.start_col + i] = '*'
             else:
                 self.grid[word.start_row + i][word.start_col] = word.string[i]
+                self.user_guesses[word.start_row + i][word.start_col] = '*'
 
         # Remove the word from the dict_by_length dictionary so that it cannot
         # appear twice. This prevents it appearing again in any crossword created
@@ -326,7 +329,7 @@ class Crossword:
         return clue_exists
 
     def get_clue(self, index, orientation):
-        """Gets a clue from one of the lists of clues based on index and 
+        """Gets a clue from one of the lists of clues based on index and
            orientation"""
         requested_clue = None
         if orientation == Orientation.HORIZONTAL:
