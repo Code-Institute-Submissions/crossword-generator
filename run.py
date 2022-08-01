@@ -37,15 +37,15 @@ def begin_puzzle(crossword):
     # display_instructions()
 
     while True:
-        print()
-        input_y_pos = TERMINAL_HEIGHT - 2
+        # print()
+        input_y_pos = TERMINAL_HEIGHT - 1
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
         sys.stdout.write(AnsiCommands.CLEAR_LINE)
         sys.stdout.flush()
         command = input('Enter a command : ')
         if command != '':
             result = parse_command(command, crossword)
-            sys.stdout.write(get_move_cursor_string(0, TERMINAL_HEIGHT - 1))
+            sys.stdout.write(get_move_cursor_string(0, TERMINAL_HEIGHT))
             sys.stdout.write(Colors.FOREGROUND_RED)
             sys.stdout.write(AnsiCommands.CLEAR_LINE)
             sys.stdout.write(result)
@@ -141,10 +141,22 @@ def display_clues(crossword):
     sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
     sys.stdout.write(get_move_cursor_string(start_col, start_row))
     sys.stdout.flush()
+    sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
+    for char in 'across':
+        sys.stdout.write(get_large_letter(char))
+    print()
+    sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
     for clue in crossword.clues_across:
-        print(f"({clue.index} {clue.orientation.value}) {clue.definitions[0]}")
+        print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
+    print()
+    sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
+    for char in 'down':
+        sys.stdout.write(get_large_letter(char))
+    print()
+    sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
     for clue in crossword.clues_down:
-        print(f"({clue.index} {clue.orientation.value}) {clue.definitions[0]}")
+        print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
+    print()
 
 def highlight_single_clue(crossword):
     """Highlight the position of one clue on the crossword puzzle, and print
@@ -178,13 +190,16 @@ def highlight_single_clue(crossword):
     
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.write(AnsiCommands.BOLD)
-    text_display_y = START_ROW + crossword.rows + 1
+    text_display_y = START_ROW + crossword.rows
     sys.stdout.write(get_move_cursor_string(0, text_display_y))
     length = len(clue.string)
     orientation = clue.orientation.value
-    string = f"{clue.index} {orientation} ({length}) {clue.definitions[0]}"
+    string = (
+        f"{Colors.FOREGROUND_ORANGE}{clue.index} {orientation} "
+        f"{Colors.FOREGROUND_YELLOW}({length}) "
+        f"{Colors.FOREGROUND_ORANGE}{clue.definitions[0]}")
     sys.stdout.write(string)
-    
+    sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.flush()
 
 def parse_command(command, crossword):
@@ -227,14 +242,16 @@ def parse_command(command, crossword):
 
         # Guess is correct length and consists of letters. Enter it in the
         # crossword.user_guesses array
-        word = elements[0]
+        word = elements[0].lower()
         clue = crossword.selected_clue
         for i, char in enumerate(word):
             if clue.orientation == Orientation.HORIZONTAL:
                 crossword.user_guesses[clue.start_row][clue.start_col + i] = char
             else:
                 crossword.user_guesses[clue.start_row + i][clue.start_col] = char
+        display_crossword(crossword)
         return f"Entered your guess : {word}"
+    return 'No match pattern'
 
 
 if __name__ == '__main__':
