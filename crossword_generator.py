@@ -21,8 +21,8 @@ class Crossword:
         
         # Generate a random crossword layout
         self.generate_words()
-        self.selected_clue = self.clues_across[0]
         self.reindex_clues()
+        self.selected_clue = self.clues_across[0]
         self.print()
 
     def generate_words(self):

@@ -26,7 +26,7 @@ def main():
             else:
                 dict_by_length[length] = []
                 dict_by_length[length].append(word)
-    crossword = Crossword(13, 13, dict_by_length, word_dict)
+    crossword = Crossword(14, 14, dict_by_length, word_dict)
 
     begin_puzzle(crossword)
 
