@@ -26,7 +26,7 @@ def main():
             else:
                 dict_by_length[length] = []
                 dict_by_length[length].append(word)
-    crossword = Crossword(17, 17, dict_by_length, word_dict)
+    crossword = Crossword(13, 13, dict_by_length, word_dict)
 
     begin_puzzle(crossword)
 
@@ -164,8 +164,8 @@ def highlight_single_clue(crossword):
     clue = crossword.selected_clue
     x_coord = START_COL + clue.start_col * 2
     y_coord = START_ROW + clue.start_row
-    back = Colors.BACKGROUND_CYAN
-    fore = Colors.FOREGROUND_BLUE
+    back = Colors.BACKGROUND_ORANGE
+    fore = Colors.FOREGROUND_WHITE
     draw_string("  ", x_coord, y_coord, [fore, back])
     first_digit = ''
     second_digit = ''
@@ -181,16 +181,16 @@ def highlight_single_clue(crossword):
         [back, fore])
     if clue.orientation == Orientation.HORIZONTAL:
         for offset in range(1, len(clue.string)):
-            back = Colors.BACKGROUND_CYAN
+            back = Colors.BACKGROUND_ORANGE
             draw_string("  ", x_coord + offset * 2, y_coord, [fore, back])
     elif clue.orientation == Orientation.VERTICAL:
         for offset in range(1, len(clue.string)):
-            back = Colors.BACKGROUND_CYAN
+            back = Colors.BACKGROUND_ORANGE
             draw_string("  ", x_coord, y_coord + offset, [back, fore])
     
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.write(AnsiCommands.BOLD)
-    text_display_y = START_ROW + crossword.rows
+    text_display_y = START_ROW + crossword.rows + 1
     sys.stdout.write(get_move_cursor_string(0, text_display_y))
     length = len(clue.string)
     orientation = clue.orientation.value

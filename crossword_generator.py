@@ -1,3 +1,4 @@
+import sys
 import random
 from constants import Orientation, get_large_letter, Colors, AnsiCommands
 from utilities import Word, Clue, find_matches
@@ -21,6 +22,7 @@ class Crossword:
         # Generate a random crossword layout
         self.generate_words()
         self.selected_clue = self.clues_across[0]
+        self.reindex_clues()
         self.print()
 
     def generate_words(self):
@@ -342,6 +344,84 @@ class Crossword:
                     requested_clue = clue
         return requested_clue
         
+    def reindex_clues(self):
+        """Reindexes the clues so that they are ordered from left to right, and
+           top to bottom. Ensures that clues across and down that share the same 
+           start_cell in the crossword grid use the same index, as only one
+           index can be printed per cell in the terminal"""
+        
+        # Create a dictionary, to hold the clues keyed by a tuple containing the
+        # start_col and start_row
+        clues_dict = {}
+
+        clues_across_reindexed = []
+        clues_down_reindexed = []
+        clues_list = self.clues_across + self.clues_down
+
+        # Iterate throught the combined list of clues, and populate the dictionary
+        for clue in clues_list:
+            start_cell = (clue.start_col, clue.start_row)
+            if start_cell in clues_dict:
+                clues_dict[start_cell].append(clue)
+            else:
+                clues_dict[start_cell] = []
+                clues_dict[start_cell].append(clue)
+
+        # Keep a counter for the next indices of across and down clues respectively
+        across_counter = 1
+        down_counter = 1
+
+        # Keep track of already the down indices already used, so that they are not
+        # duplicated.
+        unusable_down_indices = []
+
+        # Iterate through the dictionary
+        for start_cell, clues_list in sorted(clues_dict.items()):
+            if len(clues_list) > 1:
+                # There is an across clue and a down clue starting in the same cell
+                for clue in clues_list:
+                    if clue.orientation == Orientation.HORIZONTAL:
+                        # Give the across clue its next index
+                        clue.index = across_counter
+                        clues_across_reindexed.append(clue)
+                    elif clue.orientation == Orientation.VERTICAL:
+                        # Give the down clue the SAME index, and add
+                        # it to the list of used down indices
+                        clue.index = across_counter
+                        clues_down_reindexed.append(clue)
+                        unusable_down_indices.append(across_counter)
+                # Increment the across_counter
+                across_counter += 1
+            else:
+                # This clue has a unique starting cell
+                if clues_list[0].orientation == Orientation.HORIZONTAL:
+                    clues_list[0].index = across_counter
+                    clues_across_reindexed.append(clues_list[0])
+                    across_counter += 1
+                elif clues_list[0].orientation == Orientation.VERTICAL:
+                    # Don't reuse an index. Increment until a fresh one
+                    # is found
+                    while down_counter in unusable_down_indices:
+                        down_counter += 1
+                    clues_list[0].index = down_counter
+                    unusable_down_indices.append(down_counter)
+                    down_counter += 1
+                    clues_down_reindexed.append(clues_list[0])
+
+        self.clues_across = sorted(clues_across_reindexed, key=lambda clue: clue.index)
+        self.clues_down = sorted(clues_down_reindexed, key=lambda clue: clue.index)
+
+        """ print('________________________________________________')
+        print('Across:')
+        for clue in self.clues_across:
+            print(clue)
+        print()
+        print('Down:')
+        for clue in self.clues_down:
+            print(clue)
+        sys.exit() """
+
+    
     def print(self):
         """Print the crossword to the terminal"""
         light_gray = Colors.get_background_color(220, 220, 220)
