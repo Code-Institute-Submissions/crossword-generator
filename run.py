@@ -198,7 +198,6 @@ def parse_command(command, crossword):
         if elements[1].lower() == 'd' or elements[1].lower() == 'down':
             if crossword.has_clue(index, Orientation.VERTICAL):
                 new_clue = crossword.get_clue(index, Orientation.VERTICAL)
-                # highlight_single_clue(crossword, False)
                 display_crossword(crossword)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
@@ -208,7 +207,7 @@ def parse_command(command, crossword):
         elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
             if crossword.has_clue(index, Orientation.HORIZONTAL):
                 new_clue = crossword.get_clue(index, Orientation.HORIZONTAL)
-                highlight_single_clue(crossword)
+                display_crossword(crossword)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
                 return f"Clue is now {index} Across"
@@ -221,10 +220,22 @@ def parse_command(command, crossword):
         # First ensure the command consists entirely of letters
         if not command.isalpha():
             return 'Solutions can only contain letters!'
+
         # Next check if the command is the correct lenght
         if len(command) != len(crossword.selected_clue.string):
             return f"Wrong length! Length of solution should be {len(crossword.selected_clue.string)}"
-        return f"Your guess is '{command}'"
+
+        # Guess is correct length and consists of letters. Enter it in the
+        # crossword.user_guesses array
+        word = elements[0]
+        clue = crossword.selected_clue
+        for i, char in enumerate(word):
+            if clue.orientation == Orientation.HORIZONTAL:
+                crossword.user_guesses[clue.start_row][clue.start_col + i] = char
+            else:
+                crossword.user_guesses[clue.start_row + i][clue.start_col] = char
+        return f"Entered your guess : {word}"
+
 
 if __name__ == '__main__':
     main()
