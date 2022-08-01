@@ -203,7 +203,7 @@ def parse_command(command, crossword):
         elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
             if crossword.has_clue(index, Orientation.HORIZONTAL):
                 new_clue = crossword.get_clue(index, Orientation.HORIZONTAL)
-                highlight_single_clue(crossword, False)
+                highlight_single_clue(crossword)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
                 return f"Clue is now {index} Across"
