@@ -20,7 +20,7 @@ def main():
         word_dict = json.load(file)
 
         # Build a python dictionary with word lengths as keys, and lists of words of
-        # that length as values. The dictionary is used to search for matching 
+        # that length as values. The dictionary is used to search for matching
         # partial words
         for word in word_dict.keys():
             word = word.replace('\n', '')
@@ -198,6 +198,24 @@ def highlight_single_clue(crossword):
         for offset in range(1, len(clue.string)):
             back = Colors.BACKGROUND_ORANGE
             draw_string("  ", x_coord, y_coord + offset, [back, fore])
+
+    # Highlight the corresponding squares of the solution view
+    right_view_offset = 6 + crossword.cols * 2
+    x_coord = right_view_offset + clue.start_col * 2 
+    if clue.orientation == Orientation.HORIZONTAL:
+        for offset, char in enumerate(clue.string):
+            back = Colors.BACKGROUND_ORANGE
+            fore = Colors.FOREGROUND_WHITE
+            guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
+            char_to_display = "  " if guess_char == "*" else get_large_letter(guess_char)
+            draw_string(char_to_display, x_coord + offset * 2, y_coord, [fore, back])
+    elif clue.orientation == Orientation.VERTICAL:
+        for offset, char in enumerate(clue.string):
+            back = Colors.BACKGROUND_ORANGE
+            fore = Colors.FOREGROUND_WHITE
+            guess_char = crossword.user_guesses[clue.start_row + offset][clue.start_col]
+            char_to_display = "  " if guess_char == "*" else get_large_letter(guess_char)
+            draw_string(char_to_display, x_coord, y_coord + offset, [back, fore])
     
     # Print the clue text just below the views of the crossword puzzle
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
