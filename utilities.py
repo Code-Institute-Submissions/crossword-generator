@@ -26,23 +26,23 @@ class Clue:
         output = f"{self.string} : {self.index} {self.orientation.value}\n{self.definitions}"
         return output
 
-def find_matches(word, word_length_map, word_dict):
+def find_matches(candidate, word_length_map, word_dict):
     """Searches the word_dict to find matches for the supplied word.
        Returns the list of matches sorted in descending order of
        frequency"""
     # Keep a list of tuples - the characters present in the candidate, 
     # and their positional index within the word
     known_chars = []
-    for i, char in enumerate(word):
+    for i, char in enumerate(candidate):
         if char != '_':
             known_chars.append((i, char))
-    if len(word) not in word_length_map.keys():
+    if len(candidate) not in word_length_map.keys():
         return []
 
     # Grab the list of all words of equal length to the candidate
-    potential_matches = word_length_map[len(word)]
+    potential_matches = word_length_map[len(candidate)]
     matches = []
-    # If the known characters and their positions match a word, 
+    # If the known characters and their positions match a word,
     # add it to the matches list
     for potential_match in potential_matches:
         match = True
