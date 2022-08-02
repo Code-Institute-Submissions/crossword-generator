@@ -190,26 +190,6 @@ class Crossword:
                 return False
         return True
 
-    def _vertical_neighbour_check(self, row, col):
-        """Checks if the cell can be used as part of a new word in the crossword"""
-
-        # Assume that the cell is legal initially
-        cell_is_legal = True
-
-        # Only check neighbours if this cell is blank - adding a letter at the start
-        # or end of an existing word should be avoided, as it may not result in a new legal
-        # word. Running a new word through an existing word is fine, as it does not alter
-        # the existing word. In fact, it's the whole point of a crossword.
-        if self.grid(row, col) == "_":
-            has_cell_to_left = col > 0
-            has_cell_to_right = col < self.cols
-            if has_cell_to_left and self.grid[row][col - 1] != "_":
-                cell_is_legal = False
-            if has_cell_to_right and self.grid[row][col + 1] != "_":
-                cell_is_legal = False
-
-        return cell_is_legal
-
     def add_word_to_grid(self, word):
         """Adds a word to the crossword grid in the correct orientation"""
 
@@ -297,13 +277,6 @@ class Crossword:
             if not cell_before_occupied and not cell_after_occupied:
                 temp_set.add(item)
         self.intersections = temp_set
-
-    def _print_intersections(self):
-        # print("Current intersection set : ")
-        string = ""
-        for item in self.intersections:
-            string += f"{item[0]},{item[1]},{item[2].value} .... "
-        # print(string)
 
     def has_clue(self, index, orientation):
         """Returns true if a clue with the supplied index and orientation
