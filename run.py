@@ -37,6 +37,7 @@ def main():
 def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""
     display_crossword(crossword)
+    highlight_single_clue(crossword)
     displayed = 'crossword'
 
     while True:
@@ -241,7 +242,7 @@ def parse_command(command, crossword):
     # definitions, returning to the first one if the end of the list is reached
     if command == '?':
         clue = crossword.selected_clue
-        if len(clue.definitions) == 1:
+        if len() == 1:
             return "There's only one clue for that word!"
         index = clue.current_definition
         index += 1
