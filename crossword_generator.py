@@ -138,7 +138,7 @@ class Crossword:
                 return None
             matches = find_matches(shorter_candidate, self.word_length_map, self.word_dict)
 
-        choice = matches[0]
+        choice = random.choice(matches)
         return Word(orientation, choice, start_row, start_col)
 
     def _get_shorter_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
