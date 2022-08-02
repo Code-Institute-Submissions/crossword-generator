@@ -15,18 +15,22 @@ TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 
 def main():
     """Main entry point for the program"""
-    dict_by_length = {}
+    word_length_map = {}
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
         word_dict = json.load(file)
+
+        # Build a python dictionary with word lengths as keys, and lists of words of
+        # that length as values. The dictionary is used to search for matching 
+        # partial words
         for word in word_dict.keys():
             word = word.replace('\n', '')
             length = len(word)
-            if length in dict_by_length:
-                dict_by_length[length].append(word)
+            if length in word_length_map:
+                word_length_map[length].append(word)
             else:
-                dict_by_length[length] = []
-                dict_by_length[length].append(word)
-    crossword = Crossword(14, 14, dict_by_length, word_dict)
+                word_length_map[length] = []
+                word_length_map[length].append(word)
+    crossword = Crossword(14, 14, word_length_map, word_dict)
 
     begin_puzzle(crossword)
 
@@ -34,24 +38,21 @@ def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""
     display_crossword(crossword)
     displayed = 'crossword'
-    # display_instructions()
 
     while True:
-        # print()
         input_y_pos = TERMINAL_HEIGHT - 1
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
         sys.stdout.write(AnsiCommands.CLEAR_LINE)
         sys.stdout.flush()
         command = input('Enter a command : ')
         if command != '':
+            # The user may be entering the solution to a clue, or
+            # requesting a clue to be displayed
             result = parse_command(command, crossword)
-            sys.stdout.write(get_move_cursor_string(0, TERMINAL_HEIGHT))
-            sys.stdout.write(Colors.FOREGROUND_RED)
-            sys.stdout.write(AnsiCommands.CLEAR_LINE)
-            sys.stdout.write(result)
-            sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
-            sys.stdout.flush()
+            user_message = f"{AnsiCommands.CLEAR_LINE}{result}"
+            draw_string(user_message, 0, TERMINAL_HEIGHT, [Colors.FOREGROUND_RED])
         else :
+            # The user is toggling through the views
             if displayed == 'crossword':
                 displayed = 'clues'
                 display_clues(crossword)
@@ -62,10 +63,13 @@ def begin_puzzle(crossword):
 
 def display_crossword(crossword):
     """Print the crossword to the screen"""
-    
     sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
     sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
     sys.stdout.flush()
+    
+    # Print a view of the crossword with blank squares where a letter occurs
+    # in the grid. This view, on the left, will show the clue indices and 
+    # highlight the currently selected clue
     for i, row in enumerate(crossword.grid):
         sys.stdout.write(get_move_cursor_string(START_COL, START_ROW + i))
         sys.stdout.flush()
@@ -79,6 +83,8 @@ def display_crossword(crossword):
                 sys.stdout.write(output)
     sys.stdout.flush()
 
+    # Print a second view of the crossword on the right. This view displays
+    # the solutions entered by the user
     right_col = 6 + crossword.cols * 2
     for i, row in enumerate(crossword.user_guesses):
         sys.stdout.write(get_move_cursor_string(right_col, START_ROW + i))
@@ -98,6 +104,7 @@ def display_crossword(crossword):
                 sys.stdout.write(output)
     sys.stdout.flush()
 
+    # Print the clue indices on the starting square of each clue.
     sys.stdout.write(TEXT_COLOR)
     for clue in crossword.clues_across:
         first_digit = ''
@@ -174,11 +181,15 @@ def highlight_single_clue(crossword):
     else:
         first_digit = UniChars.superscript(int(clue.index / 10))
         second_digit = UniChars.superscript(clue.index % 10)
+    
+    # Draw the clue index in superscript in the starting cell of the clue
     draw_string(
         f"{first_digit}{second_digit}",
         x_coord,
         y_coord,
         [back, fore])
+
+    # Color the succeeding squares of the clue in ORANGE
     if clue.orientation == Orientation.HORIZONTAL:
         for offset in range(1, len(clue.string)):
             back = Colors.BACKGROUND_ORANGE
@@ -188,6 +199,7 @@ def highlight_single_clue(crossword):
             back = Colors.BACKGROUND_ORANGE
             draw_string("  ", x_coord, y_coord + offset, [back, fore])
     
+    # Print the clue text just below the views of the crossword puzzle
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.write(AnsiCommands.BOLD)
     text_display_y = START_ROW + crossword.rows + 1
@@ -209,7 +221,8 @@ def parse_command(command, crossword):
     elements = command.split(' ')
     if elements[0].isnumeric():
         index = int(elements[0])
-        # Check if this is a valic reference to a clue
+        # Check if this is a valic reference to a clue, and if so, highlight
+        # that clue
         if elements[1].lower() == 'd' or elements[1].lower() == 'down':
             if crossword.has_clue(index, Orientation.VERTICAL):
                 new_clue = crossword.get_clue(index, Orientation.VERTICAL)
@@ -225,7 +238,7 @@ def parse_command(command, crossword):
                 display_crossword(crossword)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
-                return f"Clue is now {index} Across"
+                return f"Now displaying {index} Across"
             else:
                 return 'No clue matches that!'
         else:
@@ -240,8 +253,9 @@ def parse_command(command, crossword):
         if len(command) != len(crossword.selected_clue.string):
             return f"Wrong length! Length of solution should be {len(crossword.selected_clue.string)}"
 
-        # Guess is correct length and consists of letters. Enter it in the
-        # crossword.user_guesses array
+        # Guess is correct length and consists only of letters. Enter it in the
+        # crossword.user_guesses array and draw the crossword views again to
+        # display the updated solution to the user
         word = elements[0].lower()
         clue = crossword.selected_clue
         for i, char in enumerate(word):
