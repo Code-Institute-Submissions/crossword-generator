@@ -227,7 +227,7 @@ def highlight_single_clue(crossword):
     string = (
         f"{Colors.FOREGROUND_ORANGE}{clue.index} {orientation} "
         f"{Colors.FOREGROUND_YELLOW}({length}) "
-        f"{Colors.FOREGROUND_ORANGE}{clue.definitions[0]}")
+        f"{Colors.FOREGROUND_ORANGE}{clue.definitions[clue.current_definition]}")
     sys.stdout.write(string)
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.flush()
@@ -236,6 +236,22 @@ def parse_command(command, crossword):
     """Parse a command entered by the user. This can be either a request
        to display a different clue, or a solution to the clue currently
        displayed"""
+
+    # If the command is just a single question mark, iterate through this clue's
+    # definitions, returning to the first one if the end of the list is reached
+    if command == '?':
+        clue = crossword.selected_clue
+        if len(clue.definitions) == 1:
+            return "There's only one clue for that word!"
+        index = clue.current_definition
+        index += 1
+        if index >= len(clue.definitions):
+            index = 0
+        clue.current_definition = index
+        display_crossword(crossword)
+        highlight_single_clue(crossword)
+        return "Showing alternative clue"
+    
     elements = command.split(' ')
     if elements[0].isnumeric():
         if len(elements) == 1:

@@ -19,6 +19,7 @@ class Clue:
         self.index = index
         self.orientation = orientation
         self.definitions = definitions
+        self.current_definition = 0
         self.start_row = start_row
         self.start_col = start_col
 
