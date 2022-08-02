@@ -1,17 +1,16 @@
-import sys
 import random
 from constants import Orientation, get_large_letter, Colors, AnsiCommands
 from utilities import Word, Clue, find_matches
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, rows, cols, dict_by_length, word_dict):
+    def __init__(self, rows, cols, word_length_map, word_dict):
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
         self.user_guesses = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
-        self.dict_by_length = dict_by_length
+        self.word_length_map = word_length_map
         self.clues_across = []
         self.clues_down = []
         self.selected_clue = None
@@ -34,32 +33,22 @@ class Crossword:
         blank_string = ''.join(blank_chars)
         
         # Find words matching this initial string, and add it to a random row.
-        matches = find_matches(blank_string, self.dict_by_length, self.word_dict)
+        matches = find_matches(blank_string, self.word_length_map, self.word_dict)
         choice = matches[0]
         random_row = random.randint(0, self.rows - 1)
         first_word = Word(Orientation.HORIZONTAL, choice, random_row, 0)
         self.add_word_to_grid(first_word)
         self.add_word_to_clues(first_word)
         
-        self.print()
-        # Loop that generates all subsequent words
+        # Loop that generates all subsequent words. Each time a word is generated,
+        # one intersection is removed, and more are added. Not all of these are usable.
         while len(self.intersections) > 0:
-            # Print the intersections_list to the terminal
             next_word = self._generate_new_word()
             if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
                 self.print()
                 self._prune_intersection_set()
-                # self._print_intersections()
-                # input("Press enter to continue")
-                print('---------------------------------------------------------')
-        for clue in self.clues_across:
-            print()
-            print(clue)
-        for clue in self.clues_down:
-            print()
-            print(clue)
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
@@ -133,7 +122,7 @@ class Crossword:
         # Words shorter than three characters cannot connect 2 existing words, so ignore them.
         if len(candidate) < 3:
             return None
-        matches = find_matches(candidate, self.dict_by_length, self.word_dict)
+        matches = find_matches(candidate, self.word_length_map, self.word_dict)
 
         # If there is no match, try removing characters from the candidate and finding new matches
         # If no shorter candidate is possible, return None and forget this intersection point
@@ -147,7 +136,7 @@ class Crossword:
                                         original_col)
             if shorter_candidate is None:
                 return None
-            matches = find_matches(shorter_candidate, self.dict_by_length, self.word_dict)
+            matches = find_matches(shorter_candidate, self.word_length_map, self.word_dict)
 
         choice = matches[0]
         return Word(orientation, choice, start_row, start_col)
@@ -199,7 +188,6 @@ class Crossword:
                 return False
             if has_cell_below and self.grid[row + 1][col] != "_":
                 return False
-
         return True
 
     def _vertical_neighbour_check(self, row, col):
@@ -237,7 +225,7 @@ class Crossword:
         # appear twice. This prevents it appearing again in any crossword created
         # in this instance of the program.
         key = len(word.string)
-        self.dict_by_length[key].remove(word.string)
+        self.word_length_map[key].remove(word.string)
 
         # Calculate the new intersections on this word
         new_start_col = word.start_col
@@ -246,7 +234,8 @@ class Crossword:
         
         # A character in the crossword grid belonging to a word can be used
         # as an intersection point for future words as long as it doesn't have
-        # occupied neighbouring cells in the direction orthogonal to the word.
+        # occupied neighbouring cells in the direction orthogonal to the word, 
+        # i.e. if the intersection was already being used by 2 words.
         if new_orientation == Orientation.VERTICAL:
             end_col = word.start_col + len(word.string) - 1
             while new_start_col < self.cols:
@@ -346,7 +335,7 @@ class Crossword:
         
     def reindex_clues(self):
         """Reindexes the clues so that they are ordered from left to right, and
-           top to bottom. Ensures that clues across and down that share the same 
+           top to bottom. Ensures that clues across and down that share the same
            start_cell in the crossword grid use the same index, as only one
            index can be printed per cell in the terminal"""
         
@@ -408,27 +397,18 @@ class Crossword:
                     down_counter += 1
                     clues_down_reindexed.append(clues_list[0])
 
-        self.clues_across = sorted(clues_across_reindexed, key=lambda clue: clue.index)
+        # The clues_across_reindexed list is already in order
+        self.clues_across = clues_across_reindexed
+        # The clues_down_reindexed list may not be, as it may have shared
+        # an index with an across clue
         self.clues_down = sorted(clues_down_reindexed, key=lambda clue: clue.index)
 
-        """ print('________________________________________________')
-        print('Across:')
-        for clue in self.clues_across:
-            print(clue)
-        print()
-        print('Down:')
-        for clue in self.clues_down:
-            print(clue)
-        sys.exit() """
-
-    
     def print(self):
         """Print the crossword to the terminal"""
         light_gray = Colors.get_background_color(220, 220, 220)
         dark_gray = Colors.get_background_color(0, 0, 0)
         text_color = Colors.get_foreground_color(0, 0, 0)
-        # print()
-        # print("Here's the crossword : ")
+        
         for row in self.grid:
             display_chars = []
             for char in row:
