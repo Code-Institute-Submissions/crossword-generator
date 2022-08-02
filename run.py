@@ -203,14 +203,14 @@ def highlight_single_clue(crossword):
     right_view_offset = 6 + crossword.cols * 2
     x_coord = right_view_offset + clue.start_col * 2 
     if clue.orientation == Orientation.HORIZONTAL:
-        for offset, char in enumerate(clue.string):
+        for offset, _ in enumerate(clue.string):
             back = Colors.BACKGROUND_ORANGE
             fore = Colors.FOREGROUND_WHITE
             guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
             char_to_display = "  " if guess_char == "*" else get_large_letter(guess_char)
             draw_string(char_to_display, x_coord + offset * 2, y_coord, [fore, back])
     elif clue.orientation == Orientation.VERTICAL:
-        for offset, char in enumerate(clue.string):
+        for offset, _ in enumerate(clue.string):
             back = Colors.BACKGROUND_ORANGE
             fore = Colors.FOREGROUND_WHITE
             guess_char = crossword.user_guesses[clue.start_row + offset][clue.start_col]
@@ -282,8 +282,28 @@ def parse_command(command, crossword):
             else:
                 crossword.user_guesses[clue.start_row + i][clue.start_col] = char
         display_crossword(crossword)
+
+        if check_crossword_complete(crossword):
+            return "You've cracked it! The crossword is completed!"
+
         return f"Entered your guess : {word}"
-    return 'No match pattern'
+
+def check_crossword_complete(crossword):
+    """Checks each clue's characters against the user_guesses grid, and returns False as soon as 
+       it finds one that doesn't match. Returns True if all are correct"""
+    all_clues = crossword.clues_across + crossword.clues_down
+    for clue in all_clues:
+        for offset, char in clue.string:
+            if clue.orientation == Orientation.HORIZONTAL:
+                guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
+                if char != guess_char:
+                    return False
+            else:
+                guess_char = crossword.user_guesses[clue.start_row + offset][clue.start_col]
+                if char != guess_char:
+                    return False
+    return True
+
 
 
 if __name__ == '__main__':

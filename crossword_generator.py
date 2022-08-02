@@ -214,7 +214,7 @@ class Crossword:
         
         # A character in the crossword grid belonging to a word can be used
         # as an intersection point for future words as long as it doesn't have
-        # occupied neighbouring cells in the direction orthogonal to the word, 
+        # occupied neighbouring cells in the direction orthogonal to the word,
         # i.e. if the intersection was already being used by 2 words.
         if new_orientation == Orientation.VERTICAL:
             end_col = word.start_col + len(word.string) - 1
