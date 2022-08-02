@@ -238,6 +238,8 @@ def parse_command(command, crossword):
        displayed"""
     elements = command.split(' ')
     if elements[0].isnumeric():
+        if len(elements) == 1:
+            return f"Enter {elements[0]} followed by 'down' or 'across'"
         index = int(elements[0])
         # Check if this is a valic reference to a clue, and if so, highlight
         # that clue
@@ -285,6 +287,8 @@ def parse_command(command, crossword):
 
         if check_crossword_complete(crossword):
             return "You've cracked it! The crossword is completed!"
+        else:
+            return "Not finished yet, young apprentice."
 
         return f"Entered your guess : {word}"
 
@@ -293,7 +297,7 @@ def check_crossword_complete(crossword):
        it finds one that doesn't match. Returns True if all are correct"""
     all_clues = crossword.clues_across + crossword.clues_down
     for clue in all_clues:
-        for offset, char in clue.string:
+        for offset, char in enumerate(clue.string):
             if clue.orientation == Orientation.HORIZONTAL:
                 guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
                 if char != guess_char:
