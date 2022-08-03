@@ -131,6 +131,25 @@ class Orientation (enum.Enum):
         else:
             return Orientation.HORIZONTAL
 
+class ViewType (enum.Enum):
+    """
+    Represents the 4 views that the user can cycle through by 
+    hitting enter at the command prompt
+    """
+    CROSSWORD = 0
+    CLUES_ACROSS = 1
+    CLUES_DOWN = 2
+    INSTRUCTIONS = 3
+
+    def next(self):
+        """Cycle through the enum values, returning to the first value
+           once the last is passed"""
+        index = self.value
+        index +=1
+        if index >= len(list(ViewType)):
+            index = 0
+        return ViewType(index)
+
 
 def get_large_letter(char):
     """Returns a large (double width) version of the character supplied"""
