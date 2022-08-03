@@ -2,7 +2,7 @@ import sys
 import json
 from crossword_generator import Crossword
 from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
-from constants import AnsiCommands, Colors, UniChars, Orientation, get_large_letter
+from constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24
@@ -35,10 +35,10 @@ def main():
     begin_puzzle(crossword)
 
 def begin_puzzle(crossword):
+    current_view = ViewType.CROSSWORD
     """Allows the user to begin solving the puzzle"""
-    display_crossword(crossword)
+    display_crossword(crossword, current_view)
     highlight_single_clue(crossword)
-    displayed = 'crossword'
 
     while True:
         input_y_pos = TERMINAL_HEIGHT - 1
@@ -49,20 +49,30 @@ def begin_puzzle(crossword):
         if command != '':
             # The user may be entering the solution to a clue, or
             # requesting a clue to be displayed
-            result = parse_command(command, crossword)
+            result = parse_command(command, crossword, current_view)
             user_message = f"{AnsiCommands.CLEAR_LINE}{result}"
             draw_string(user_message, 0, TERMINAL_HEIGHT, [Colors.FOREGROUND_RED])
         else :
             # The user is toggling through the views
-            if displayed == 'crossword':
-                displayed = 'clues'
-                display_clues(crossword)
-            elif displayed == 'clues':
-                displayed = 'crossword'
-                display_crossword(crossword)
+            current_view = current_view.next()
+            if current_view == ViewType.CROSSWORD:
+                display_crossword(crossword, current_view)
                 highlight_single_clue(crossword)
+            elif current_view == ViewType.CLUES_ACROSS:
+                display_clues(crossword, Orientation.HORIZONTAL, current_view)
+            elif current_view == ViewType.CLUES_DOWN:
+                display_clues(crossword, Orientation.VERTICAL, current_view)
+            elif current_view == ViewType.INSTRUCTIONS:
+                display_instructions(current_view)
 
-def display_crossword(crossword):
+def display_instructions(current_view):
+    """Prints the instructions to the display"""
+    sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
+    sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
+    draw_string("INSTRUCTIONS: Don't be a dope.".center(80), 0, 10, [])
+    print_view_type_bar(current_view)
+
+def display_crossword(crossword, current_view):
     """Print the crossword to the screen"""
     sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
     sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
@@ -141,7 +151,9 @@ def display_crossword(crossword):
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.flush()
 
-def display_clues(crossword):
+    print_view_type_bar(current_view)
+
+def display_clues(crossword, orientation, current_view):
     """Print the clues to the screen"""
     start_col = 1
     start_row = 2
@@ -149,22 +161,25 @@ def display_clues(crossword):
     sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
     sys.stdout.write(get_move_cursor_string(start_col, start_row))
     sys.stdout.flush()
-    sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
-    for char in 'across':
-        sys.stdout.write(get_large_letter(char))
-    print()
-    sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
-    for clue in crossword.clues_across:
-        print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
-    print()
-    sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
-    for char in 'down':
-        sys.stdout.write(get_large_letter(char))
-    print()
-    sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
-    for clue in crossword.clues_down:
-        print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
-    print()
+
+    if orientation == Orientation.HORIZONTAL:
+        sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
+        for char in 'across':
+            sys.stdout.write(get_large_letter(char))
+        print()
+        sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
+        for clue in crossword.clues_across:
+            print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
+    else:
+        sys.stdout.write(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}")
+        for char in 'down':
+            sys.stdout.write(get_large_letter(char))
+        print()
+        sys.stdout.write(f"{AnsiCommands.NORMAL}{AnsiCommands.DEFAULT_COLOR}")
+        for clue in crossword.clues_down:
+            print(f"({clue.index} {clue.orientation.value}) ({len(clue.string)}) {clue.definitions[0]}")
+
+    print_view_type_bar(current_view)        
 
 def highlight_single_clue(crossword):
     """Highlight the position of one clue on the crossword puzzle, and print
@@ -233,7 +248,7 @@ def highlight_single_clue(crossword):
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.flush()
 
-def parse_command(command, crossword):
+def parse_command(command, crossword, current_view):
     """Parse a command entered by the user. This can be either a request
        to display a different clue, or a solution to the clue currently
        displayed"""
@@ -249,7 +264,7 @@ def parse_command(command, crossword):
         if index >= len(clue.definitions):
             index = 0
         clue.current_definition = index
-        display_crossword(crossword)
+        display_crossword(crossword, current_view)
         highlight_single_clue(crossword)
         return "Showing alternative clue"
     
@@ -263,7 +278,7 @@ def parse_command(command, crossword):
         if elements[1].lower() == 'd' or elements[1].lower() == 'down':
             if crossword.has_clue(index, Orientation.VERTICAL):
                 new_clue = crossword.get_clue(index, Orientation.VERTICAL)
-                display_crossword(crossword)
+                display_crossword(crossword, current_view)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
                 return f"Now showing {index} Down"
@@ -272,7 +287,7 @@ def parse_command(command, crossword):
         elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
             if crossword.has_clue(index, Orientation.HORIZONTAL):
                 new_clue = crossword.get_clue(index, Orientation.HORIZONTAL)
-                display_crossword(crossword)
+                display_crossword(crossword, current_view)
                 crossword.selected_clue = new_clue
                 highlight_single_clue(crossword)
                 return f"Now displaying {index} Across"
@@ -300,7 +315,7 @@ def parse_command(command, crossword):
                 crossword.user_guesses[clue.start_row][clue.start_col + i] = char
             else:
                 crossword.user_guesses[clue.start_row + i][clue.start_col] = char
-        display_crossword(crossword)
+        display_crossword(crossword, current_view)
 
         if check_crossword_complete(crossword):
             return "You've cracked it! The crossword is completed!"
@@ -325,6 +340,27 @@ def check_crossword_complete(crossword):
                     return False
     return True
 
+def print_view_type_bar(current_view, in_flow=False):
+    """Display the ViewType selection bar at the bottom of the display"""
+    y_pos = TERMINAL_HEIGHT - 3
+    tab_width = int(TERMINAL_WIDTH / 4) - 4
+    output = ""
+    for view_type in list(ViewType):
+        string = view_type.name.center(tab_width)
+        if current_view is view_type:
+            output += Colors.BACKGROUND_CYAN
+            output += Colors.FOREGROUND_PURPLE
+            output += AnsiCommands.BOLD
+            output += string
+            output += AnsiCommands.NORMAL
+            output += AnsiCommands.DEFAULT_COLOR
+        else:
+            output += string
+        output += " >> "
+    if in_flow:
+        print(output)
+    else:
+        draw_string(output, 0, y_pos, [])
 
 
 if __name__ == '__main__':
