@@ -77,6 +77,8 @@ class Crossword:
 
         # Create a list to hold the characters that will appear in the word, and
         # add the character at the intersection point to it
+        max_lengths = [6, 7, 8, 9, 10, 11, 12]
+        max_length = random.choice(max_lengths)
         candidate = []
         candidate.append(self.grid[original_row][original_col])
         
@@ -84,14 +86,14 @@ class Crossword:
         # the longest possible word than includes the intersection point
         if orientation == Orientation.VERTICAL:
             row = start_row + 1
-            while row < self.rows:
+            while row < self.rows and len(candidate) < max_length:
                 if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
                     candidate.append(self.grid[row][start_col])
                 else:
                     break
                 row += 1
             row = start_row - 1
-            while row >= 0:
+            while row >= 0 and len(candidate) < max_length:
                 if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
                     candidate.insert(0, self.grid[row][start_col])
 
@@ -102,14 +104,14 @@ class Crossword:
                 row -= 1
         elif orientation == Orientation.HORIZONTAL:
             col = start_col + 1
-            while col < self.cols:
+            while col < self.cols and len(candidate) < max_length:
                 if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
                     candidate.append(self.grid[start_row][col])
                 else:
                     break
                 col += 1
             col = start_col - 1
-            while col >= 0:
+            while col >= 0 and len(candidate) < max_length:
                 if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
                     candidate.insert(0, self.grid[start_row][col])
 
