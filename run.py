@@ -30,22 +30,22 @@ def main():
             else:
                 word_length_map[length] = []
                 word_length_map[length].append(word)
-    crossword = Crossword(14, 14, word_length_map, word_dict)
+    crossword = Crossword(11, 11, word_length_map, word_dict)
 
     begin_puzzle(crossword)
 
 def begin_puzzle(crossword):
-    current_view = ViewType.CROSSWORD
     """Allows the user to begin solving the puzzle"""
+    current_view = ViewType.CROSSWORD
     display_crossword(crossword, current_view)
     highlight_single_clue(crossword)
 
     while True:
-        input_y_pos = TERMINAL_HEIGHT - 1
+        input_y_pos = TERMINAL_HEIGHT - 2
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
         sys.stdout.write(AnsiCommands.CLEAR_LINE)
         sys.stdout.flush()
-        command = input('Enter a command : ')
+        command = input('Enter answer, select clue (e.g. "2 across"), or hit enter to change view :\n')
         if command != '':
             # The user may be entering the solution to a clue, or
             # requesting a clue to be displayed
@@ -342,7 +342,7 @@ def check_crossword_complete(crossword):
 
 def print_view_type_bar(current_view, in_flow=False):
     """Display the ViewType selection bar at the bottom of the display"""
-    y_pos = TERMINAL_HEIGHT - 3
+    y_pos = TERMINAL_HEIGHT - 4
     tab_width = int(TERMINAL_WIDTH / 4) - 4
     output = ""
     for view_type in list(ViewType):

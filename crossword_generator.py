@@ -77,7 +77,7 @@ class Crossword:
 
         # Create a list to hold the characters that will appear in the word, and
         # add the character at the intersection point to it
-        max_lengths = [6, 7, 8, 9, 10, 11, 12]
+        max_lengths = [6, 7, 8, 9, 10]
         max_length = random.choice(max_lengths)
         candidate = []
         candidate.append(self.grid[original_row][original_col])
