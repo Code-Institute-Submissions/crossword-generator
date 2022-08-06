@@ -132,9 +132,19 @@ class Orientation (enum.Enum):
         else:
             return Orientation.HORIZONTAL
 
+class LetterUse (enum.Enum):
+    """
+    Represents the orientation of the words that use this letter
+    in the grid
+    """
+    ACROSS = "Across"
+    DOWN = "Down"
+    BOTH = "Both"
+    NONE = "None"
+
 class ViewType (enum.Enum):
     """
-    Represents the 4 views that the user can cycle through by 
+    Represents the 4 views that the user can cycle through by
     hitting enter at the command prompt
     """
     CROSSWORD = 0

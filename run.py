@@ -339,7 +339,7 @@ def parse_command(command, crossword, current_view):
         if not command.isalpha():
             return 'Solutions can only contain letters!'
 
-        # Next check if the command is the correct lenght
+        # Next check if the command is the correct length
         if len(command) != len(crossword.selected_clue.string):
             return f"Wrong length! Length of solution should be {len(crossword.selected_clue.string)}"
 

@@ -1,7 +1,7 @@
 import random
 import sys
 from time import sleep
-from constants import Orientation, get_large_letter, Colors, AnsiCommands
+from constants import LetterUse, Orientation, get_large_letter, Colors, AnsiCommands
 from utilities import Word, Clue, find_matches, get_alternating_square_color, get_move_cursor_string
 
 class Crossword:
@@ -10,12 +10,14 @@ class Crossword:
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
+        self.letter_use = [[LetterUse.NONE for i in range(rows)] for j in range(cols)]
         self.user_guesses = [["_" for i in range(rows)] for j in range(cols)]
         self.word_dict = word_dict
         self.word_length_map = word_length_map
         self.clues_across = []
         self.clues_down = []
         self.selected_clue = None
+        self.last_clue_added = None
 
         # A set is used to prevent duplicate intersections
         self.intersections = set()
@@ -50,6 +52,7 @@ class Crossword:
         # one intersection is removed, and more are added. Not all of these are usable.
         while len(self.intersections) > 0:
             next_word = self._generate_new_word()
+            self.last_clue_added = next_word
             if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
@@ -57,11 +60,13 @@ class Crossword:
                 self._prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-                self.print(False)
+                self.print(True)
 
                 # Print the welcome message
                 self.print_welcome_message()
-                sleep(0.1)
+                print(self.last_clue_added.string)
+                # sleep(1)
+                input()
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
@@ -90,23 +95,21 @@ class Crossword:
 
         # Create a list to hold the characters that will appear in the word, and
         # add the character at the intersection point to it
-        max_lengths = [6, 7, 8, 9, 10]
-        max_length = random.choice(max_lengths)
         candidate = []
         candidate.append(self.grid[original_row][original_col])
         
         # Probe the existing crossword grid forwards, and then backwards, to generate
-        # the longest possible word than includes the intersection point
+        # the longest possible word less than max_length than includes the intersection point
         if orientation == Orientation.VERTICAL:
             row = start_row + 1
-            while row < self.rows and len(candidate) < max_length:
+            while row < self.rows:
                 if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
                     candidate.append(self.grid[row][start_col])
                 else:
                     break
                 row += 1
             row = start_row - 1
-            while row >= 0 and len(candidate) < max_length:
+            while row >= 0:
                 if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
                     candidate.insert(0, self.grid[row][start_col])
 
@@ -117,14 +120,14 @@ class Crossword:
                 row -= 1
         elif orientation == Orientation.HORIZONTAL:
             col = start_col + 1
-            while col < self.cols and len(candidate) < max_length:
+            while col < self.cols:
                 if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
                     candidate.append(self.grid[start_row][col])
                 else:
                     break
                 col += 1
             col = start_col - 1
-            while col >= 0 and len(candidate) < max_length:
+            while col >= 0:
                 if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
                     candidate.insert(0, self.grid[start_row][col])
 
@@ -133,6 +136,15 @@ class Crossword:
                 else:
                     break
                 col -= 1
+        
+        # If the first or last character of the candidate is adjacent to an existing word
+        # without intersecting it, remove it.
+        candidate = self.check_for_adjacency(candidate, 
+                                             orientation, 
+                                             start_row, 
+                                             start_col,
+                                             original_row,
+                                             original_col)
 
         # Words shorter than three characters cannot connect 2 existing words, so ignore them.
         if len(candidate) < 3:
@@ -160,7 +172,7 @@ class Crossword:
         if orientation == Orientation.HORIZONTAL:
             # 3 is the minimum word length, and the word must include the original intersection
             while len(candidate) > 3 and start_col + len(candidate) > original_col:
-                # While cells can still be removed, remove the last one. If it is empty, 
+                # While cells can still be removed, remove the last one. If it is empty,
                 # then this new candidate does not abut an existing word, so return it
                 removed_cell = candidate.pop()
                 if removed_cell == '_':
@@ -176,6 +188,26 @@ class Crossword:
             # No shorter candidates are possible, so return None
             return None
 
+    def check_for_adjacency(self, candidate, orientation, start_row, start_col, original_row, original_col):
+        """Checks that the first and last characters of a candidate clue do not touch
+           another clue without intersecting. If they do, the function removes the
+           offending character(s)"""
+        if orientation == Orientation.HORIZONTAL:
+            if start_col > 0 and self.grid[start_row][start_col - 1] != '_':
+                candidate.pop(0)
+            at_edge = start_col + len(candidate) >= self.cols
+            if not at_edge and self.grid[start_row][start_col + len(candidate)] != '_':
+                candidate.pop()
+            return candidate
+        elif orientation == Orientation.VERTICAL:
+            if start_row > 0 and self.grid[start_row - 1][start_col] != '_':
+                candidate.pop(0)
+            at_edge = start_row + len(candidate) >= self.rows
+            if not at_edge and self.grid[start_row + len(candidate)][start_col] != '_':
+                candidate.pop()
+            return candidate
+        
+        return candidate
 
     def _check_cell_is_legal(self, row, col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
@@ -212,9 +244,15 @@ class Crossword:
             if word.orientation == Orientation.HORIZONTAL:
                 self.grid[word.start_row][word.start_col + i] = word.string[i]
                 self.user_guesses[word.start_row][word.start_col + i] = '*'
+                use = self.letter_use[word.start_row][word.start_col + i]
+                use = LetterUse.ACROSS if use == LetterUse.NONE else LetterUse.BOTH
+                self.letter_use[word.start_row][word.start_col + i] = use
             else:
                 self.grid[word.start_row + i][word.start_col] = word.string[i]
                 self.user_guesses[word.start_row + i][word.start_col] = '*'
+                use = self.letter_use[word.start_row + i][word.start_col]
+                use = LetterUse.DOWN if use == LetterUse.NONE else LetterUse.BOTH
+                self.letter_use[word.start_row + i][word.start_col] = use
 
         # Remove the word from the dict_by_length dictionary so that it cannot
         # appear twice. This prevents it appearing again in any crossword created

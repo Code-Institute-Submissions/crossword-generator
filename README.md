@@ -43,6 +43,9 @@ An object-oriented approach was employed for the process of crossword generation
 ### Automated Testing
 ### Bugs
 #### Solved Bugs
+
+A bug was found in the crossword generation algorithm, whereby a word could end up adjacent to another word without intersecting it. This was not present in the original algorithm, which always selected the longest word possible, but was introduced along with a random choice of max length for each word. (The random max length was necessary as crosswords with too many long and difficult clues were being generated). The problem was caused by the probing routine in the `generate_new_word()` function stopping abruptly when the max length was reached, without checking to see if the last cell added was legal or not.
+
 #### Remaining Bugs
 ### Validator Testing
 
