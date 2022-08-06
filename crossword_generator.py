@@ -1,6 +1,8 @@
 import random
+import sys
+from time import sleep
 from constants import Orientation, get_large_letter, Colors, AnsiCommands
-from utilities import Word, Clue, find_matches
+from utilities import Word, Clue, find_matches, get_alternating_square_color, get_move_cursor_string
 
 class Crossword:
     """Represents a crossword object"""
@@ -22,7 +24,11 @@ class Crossword:
         self.generate_words()
         self.reindex_clues()
         self.selected_clue = self.clues_across[0]
-        self.print()
+        row = 8
+        col = 4 + (self.cols * 2) + 6
+        sys.stdout.write(get_move_cursor_string(col, row))
+        sys.stdout.flush()
+        input("Press a key to continue ...")
 
     def generate_words(self):
         """This function generates the words for the crossword"""
@@ -49,6 +55,13 @@ class Crossword:
                 self.add_word_to_clues(next_word)
                 self.print()
                 self._prune_intersection_set()
+                sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
+                sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
+                self.print(False)
+
+                # Print the welcome message
+                self.print_welcome_message()
+                sleep(0.1)
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
@@ -378,18 +391,47 @@ class Crossword:
         # an index with an across clue
         self.clues_down = sorted(clues_down_reindexed, key=lambda clue: clue.index)
 
-    def print(self):
+    def print(self, show_letters=True):
         """Print the crossword to the terminal"""
-        light_gray = Colors.get_background_color(220, 220, 220)
         dark_gray = Colors.get_background_color(0, 0, 0)
         text_color = Colors.get_foreground_color(0, 0, 0)
+        origin_row = 4
+        origin_col = 4
         
-        for row in self.grid:
+        for i, row in enumerate(self.grid):
             display_chars = []
-            for char in row:
+            for j, char in enumerate(row):
+                letter = "  "
+                color = get_alternating_square_color(i, j)
+                if show_letters:
+                    letter = get_large_letter(char)
                 if char == '_':
                     display_chars.append(f"{dark_gray}  {AnsiCommands.DEFAULT_COLOR}")
                 else:
-                    display_chars.append(f"{light_gray}{text_color}{get_large_letter(char)}{AnsiCommands.DEFAULT_COLOR}")
+                    display_chars.append(f"{color}{text_color}{letter}{AnsiCommands.DEFAULT_COLOR}")
             string = ''.join(display_chars)
-            print(string)
+            sys.stdout.write(get_move_cursor_string(origin_col, origin_row + i))
+            sys.stdout.write(string)
+        sys.stdout.flush()
+
+    def print_welcome_message(self):
+        """Prints a simple welcome message to show while the crossword generation
+           animation is running"""
+        title = "crossword generator"
+        row = 6
+        col = 4 + (self.cols * 2) + 4
+        sys.stdout.write(Colors.FOREGROUND_BLUE)
+        sys.stdout.write(AnsiCommands.BOLD)
+        for index, char in enumerate(title):
+            glyph = " " if char == " " else get_large_letter(char)
+            sys.stdout.write(get_move_cursor_string(col + index * 2, row))
+            sys.stdout.write(glyph)
+        sys.stdout.flush()
+
+        message = "Creating your crossword ..."
+        row = 8
+        col = 4 + (self.cols * 2) + 6
+        for index, char in enumerate(message):
+            sys.stdout.write(get_move_cursor_string(col + index, row))
+            sys.stdout.write(char)
+        sys.stdout.flush()
