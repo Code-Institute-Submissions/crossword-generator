@@ -95,11 +95,22 @@ def display_crossword(crossword, current_view):
     sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
     sys.stdout.flush()
     
+    half_screen_width = int(TERMINAL_WIDTH / 2)
+
+    # Each cell of the puzzle requires 2 squares
+    half_puzzle_width = int(crossword.cols)
+
+    # The top left corner of the first puzzle
+    origin_left = int(TERMINAL_WIDTH / 4) - half_puzzle_width
+
+    # The top left corner of the second puzzle
+    origin_right = origin_left + half_screen_width
+
     # Print a view of the crossword with blank squares where a letter occurs
     # in the grid. This view, on the left, will show the clue indices and
     # highlight the currently selected clue
     for i, row in enumerate(crossword.grid):
-        sys.stdout.write(get_move_cursor_string(START_COL, START_ROW + i))
+        sys.stdout.write(get_move_cursor_string(origin_left, START_ROW + i))
         sys.stdout.flush()
         for j, col in enumerate(row):
             if crossword.grid[i][j] == '_':
@@ -113,9 +124,8 @@ def display_crossword(crossword, current_view):
 
     # Print a second view of the crossword on the right. This view displays
     # the solutions entered by the user
-    right_col = 6 + crossword.cols * 2
     for i, row in enumerate(crossword.user_guesses):
-        sys.stdout.write(get_move_cursor_string(right_col, START_ROW + i))
+        sys.stdout.write(get_move_cursor_string(origin_right, START_ROW + i))
         sys.stdout.flush()
         for j, col in enumerate(row):
             if crossword.user_guesses[i][j] == '_':
@@ -144,9 +154,9 @@ def display_crossword(crossword, current_view):
             second_digit = f"{UniChars.superscript(clue.index % 10)}"
 
         row = START_ROW + clue.start_row
-        col = START_COL + clue.start_col
-        sys.stdout.write(get_move_cursor_string((col - 1) * 2, row))
-        color = get_alternating_square_color(row, col)
+        col = origin_left + clue.start_col * 2
+        sys.stdout.write(get_move_cursor_string(col, row))
+        color = get_alternating_square_color(clue.start_row, clue.start_col)
         sys.stdout.write(f"{color}")
         sys.stdout.write(f"{first_digit}{second_digit}")
 
@@ -160,9 +170,9 @@ def display_crossword(crossword, current_view):
             second_digit = f"{UniChars.superscript(clue.index % 10)}"
 
         row = START_ROW + clue.start_row
-        col = START_COL + clue.start_col
-        sys.stdout.write(get_move_cursor_string((col - 1) * 2, row))
-        color = get_alternating_square_color(row, col)
+        col = origin_left + clue.start_col * 2
+        sys.stdout.write(get_move_cursor_string((col), row))
+        color = get_alternating_square_color(clue.start_row, clue.start_col)
         sys.stdout.write(f"{color}")
         sys.stdout.write(f"{first_digit}{second_digit}")
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
@@ -202,7 +212,19 @@ def highlight_single_clue(crossword):
     """Highlight the position of one clue on the crossword puzzle, and print
        that clue below the crossword"""
     clue = crossword.selected_clue
-    x_coord = START_COL + clue.start_col * 2
+
+    half_screen_width = int(TERMINAL_WIDTH / 2)
+
+    # Each cell of the puzzle requires 2 squares
+    half_puzzle_width = int(crossword.cols)
+
+    # The top left corner of the first puzzle
+    origin_left = int(TERMINAL_WIDTH / 4) - half_puzzle_width
+
+    # The top left corner of the second puzzle
+    origin_right = origin_left + half_screen_width
+
+    x_coord = origin_left + clue.start_col * 2
     y_coord = START_ROW + clue.start_row
     back = Colors.BACKGROUND_ORANGE
     fore = Colors.FOREGROUND_WHITE
@@ -233,8 +255,7 @@ def highlight_single_clue(crossword):
             draw_string("  ", x_coord, y_coord + offset, [back, fore])
 
     # Highlight the corresponding squares of the solution view
-    right_view_offset = 6 + crossword.cols * 2
-    x_coord = right_view_offset + clue.start_col * 2 
+    x_coord = origin_right + clue.start_col * 2
     if clue.orientation == Orientation.HORIZONTAL:
         for offset, _ in enumerate(clue.string):
             back = Colors.BACKGROUND_ORANGE
