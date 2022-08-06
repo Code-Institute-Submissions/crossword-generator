@@ -36,9 +36,10 @@ def main():
 
 def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""
-    current_view = ViewType.CROSSWORD
-    display_crossword(crossword, current_view)
-    highlight_single_clue(crossword)
+    current_view = ViewType.INSTRUCTIONS
+    display_instructions(current_view)
+    # display_crossword(crossword, current_view)
+    # highlight_single_clue(crossword)
 
     while True:
         input_y_pos = TERMINAL_HEIGHT - 2
@@ -67,9 +68,25 @@ def begin_puzzle(crossword):
 
 def display_instructions(current_view):
     """Prints the instructions to the display"""
-    sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
-    sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-    draw_string("INSTRUCTIONS: Don't be a dope.".center(80), 0, 10, [])
+    style = (
+        f"{AnsiCommands.CLEAR_BUFFER}{AnsiCommands.CLEAR_SCREEN}"
+        f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}"
+    )
+    title = "INSTRUCTIONS".center(80)
+    draw_string(style + title, 0, 2, [])
+    style = f"{AnsiCommands.NORMAL}"
+    para1 = (
+    " There are two crossword puzzles next to each other on the main page. The\n"
+    " puzzle on the left just shows the clue numbers in the starting square of each\n"
+    " clue. The puzzle on the right show the answers that you've already entered.\n\n"
+    " Pressing enter repeatedly allow you to tab through the 4 views\n\n"
+    "   1) The main game view, showing the 2 crosswords and the current clue\n"
+    "   2) All of the Across clues\n"
+    "   3) All of the Down clues\n"
+    "   4) This instructions page again!\n\n"
+    " To enter your answer for the current clue, simply type it into the terminal\n\n"
+    " To switch to another clue, enter its description, e.g. '2 across' or '7 down'.\n")
+    draw_string(style + para1, 0, 4, [])
     print_view_type_bar(current_view)
 
 def display_crossword(crossword, current_view):
@@ -79,7 +96,7 @@ def display_crossword(crossword, current_view):
     sys.stdout.flush()
     
     # Print a view of the crossword with blank squares where a letter occurs
-    # in the grid. This view, on the left, will show the clue indices and 
+    # in the grid. This view, on the left, will show the clue indices and
     # highlight the currently selected clue
     for i, row in enumerate(crossword.grid):
         sys.stdout.write(get_move_cursor_string(START_COL, START_ROW + i))
@@ -348,15 +365,19 @@ def print_view_type_bar(current_view, in_flow=False):
     for view_type in list(ViewType):
         string = view_type.name.center(tab_width)
         if current_view is view_type:
-            output += Colors.BACKGROUND_CYAN
-            output += Colors.FOREGROUND_PURPLE
+            output += Colors.get_background_color(150, 50, 50)
+            output += Colors.FOREGROUND_WHITE
             output += AnsiCommands.BOLD
             output += string
             output += AnsiCommands.NORMAL
-            output += AnsiCommands.DEFAULT_COLOR
         else:
+            output += Colors.get_background_color(200, 200, 200)
+            output += Colors.FOREGROUND_BLACK
             output += string
+        output += Colors.get_background_color(150, 150, 150)
+        output += Colors.FOREGROUND_BLACK
         output += " >> "
+        output += AnsiCommands.DEFAULT_COLOR
     if in_flow:
         print(output)
     else:
