@@ -1,9 +1,9 @@
 import sys
 import json
-from crossword_generator import Crossword
-from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
-from constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
-from crossword_validator import validate
+from code.crossword_generator import Crossword
+from code.utilities import draw_string, get_move_cursor_string, get_alternating_square_color
+from code.constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
+from code.crossword_validator import validate
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24
@@ -45,6 +45,8 @@ def begin_puzzle(crossword):
 
     while True:
         input_y_pos = TERMINAL_HEIGHT - 2
+        sys.stdout.write(get_move_cursor_string(0, input_y_pos + 1))
+        sys.stdout.write(AnsiCommands.CLEAR_LINE)
         sys.stdout.write(get_move_cursor_string(0, input_y_pos))
         sys.stdout.write(AnsiCommands.CLEAR_LINE)
         sys.stdout.flush()
@@ -323,7 +325,7 @@ def parse_command(command, crossword, current_view):
                 highlight_single_clue(crossword)
                 return f"Now showing {index} Down"
             else:
-                return 'No clue matches that!'
+                return f'No clue matches {elements[0]} {elements[1]}!'
         elif elements[1].lower() == 'a' or elements[1].lower() == 'across':
             if crossword.has_clue(index, Orientation.HORIZONTAL):
                 new_clue = crossword.get_clue(index, Orientation.HORIZONTAL)
@@ -332,7 +334,7 @@ def parse_command(command, crossword, current_view):
                 highlight_single_clue(crossword)
                 return f"Now displaying {index} Across"
             else:
-                return 'No clue matches that!'
+                return f'No clue matches {elements[0]} {elements[1]}!'
         else:
             return 'No such clue!'
     else:
