@@ -30,7 +30,7 @@ class Crossword:
         col = 4 + (self.cols * 2) + 6
         sys.stdout.write(get_move_cursor_string(col, row))
         sys.stdout.flush()
-        # input("Press a key to continue ...")
+        input("Complete! Press a key to continue ...")
 
     def generate_words(self):
         """This function generates the words for the crossword"""
@@ -60,13 +60,11 @@ class Crossword:
                 self._prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-                self.print(show_letters=True)
+                self.print(show_letters=False)
 
                 # Print the welcome message
                 self.print_welcome_message()
-                print(self.last_clue_added.string)
-                # sleep(.05)
-                # input()
+                sleep(.2)
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
@@ -457,7 +455,7 @@ class Crossword:
         for i, row in enumerate(self.grid):
             display_chars = []
             for j, char in enumerate(row):
-                letter = "  "
+                letter = get_large_letter("x")
                 color = get_alternating_square_color(i, j)
                 if show_letters:
                     letter = get_large_letter(char)

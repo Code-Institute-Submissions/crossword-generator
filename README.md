@@ -15,7 +15,35 @@ to solve them using a command line interface.
 ### Future Features
 - A future extension of the project could involve the development of a GUI, ideally deployed to the web, where a user could request a generated crossword from the backend and then curate the clues, adding their own alternatives of greater or lesser difficulty, and asking the backend to find alternative words for particular positions in the crossword. The model of using dictionary definitions as clues does produce a usable result as a prototype, but keeping the difficulty and obscurity of the clues within a tight range that would be satisfying to the puzzle solver is probably best done by a human in the loop. 
 
-## Development Process
+# UX - User Experience
+
+## User Stories - 
+- #### First Time Visitor Goals
+    - As a first-time visitor, I want to be able to quickly engage in the game, 
+    - As a first-time visitor, I would like an easy, simple to use interface
+
+- #### Returning Visitor Goals
+    - As a returning visitor, I would like to be able to request an alternate clue when I am stuck.
+
+## Design
+The design of the program had to work within the constraints of an 80x24 terminal window, so layout of the crossword, clues and instructions was very important. I elected to display the crossword twice:
+- The first view displays the empty layout and clue numbers, to act as a reference for the user.
+- The second view displays the answers that the user has already input.
+
+Beneath the 2 crossword views, the current clue is printed in orange text. This clue is also highlighted in orange on the 2 views.
+
+Beneath the current clue, a horizontal bar names the four screens that it is possible to display, with the current screen's name highlighted in red:
+- The normal puzzle view, with the 2 crosswords at the top of the display
+- The Clues Across screen, listing all the clues that run horizontally in the puzzle at the same time.
+- The Clues Down screen, listing the vertical clues.
+- The Instructions screen, where the user can learn how to use the program. This screen is visible at the start.
+
+Below the navigation bar, the prompt appears where the user can input their answers, highlight a different clue, or cycle through the 4 screens by pressing enter.
+
+The navigation bar and the input prompt are common to all four screens, to ensure that the user has a consistent experience using the program.
+
+
+# Development Process
 There were two distinct development phases in this project, with the first phase involving the creation of a data source for generating the crossword puzzles. The process of assembling the data is outlined [here](DATA_PREPARATION.md). 
 
 The second phase involved writing the code to generate the crossword, and allow the user to enter their guesses on the crossword grid.
@@ -38,29 +66,52 @@ An object-oriented approach was employed for the process of crossword generation
 
 ![flowchart for puzzle solver](documentation_images/crossword_puzzle_flow.png)
 
-## Testing
+# Testing
 Four different testing approaches were used in the project:
 - Manual testing
 - Automated testing
 - In-app testing
 - User story testing
 
-### Manual Testing
-### Automated Testing
-### In-app Testing
+## Manual Testing
+## Automated Testing
+## In-app Testing
 It is preferable for automated testing to be deterministic, i.e. for the same tests to be run on the code every time. So, in the automated testing, the same crosswords are used as fixtures each time. Because crosswords are usually generated randomly, it is possible that a given bug, dependent on a particular crossword layout, may not appear when the program is repeatedly tested against the pre-generated crosswords in automated testing.
 
 For this reason, the project contains the python file `crossword_validation.py`, whose `validate(crossword)` method is invoked by `run.py` after a new random crossword is generated. This ensures that the crossword meets several requirements and is a valid crossword that can be solved by the user. The validator also has its own `main()` method, which generates 100 crosswords and validates each one in turn. This feature was included to mitigate the deterministic nature of the automated tests, and ensure that rare or difficult to reproduce bugs would be detectable.
-### User Story Testing
-### Bugs
-#### Solved Bugs
+## User Story Testing
+- #### First Time Visitor Goals
+    - *As a first-time visitor, I want to be able to quickly engage in the game.*
+    The game loads quickly, and after a brief animation of the crossword being created, the user is taken immediately to the instructions screen. From here, one tap of the enter button and the user is trying to solve the puzzle.
+    
+    - *As a first-time visitor, I would like an easy, simple to use interface.*
+    There are only 3 types of command possible - entering an answer, switching to a different clue, and cycling through the 4 display screens. This enables the user to navigate through a considerable quantity of information (presented in a very small space) easily and intuitively.
+
+- #### Returning Visitor Goals
+    - *As a returning visitor, I would like to be able to request an alternate clue when I am stuck.* 
+    Entering a question mark will present the user with all of the alternative definitions of the word that exist, or inform them if there is only one.
+# Bugs
+## Solved Bugs
 
 A bug was found in the crossword generation algorithm, whereby a word could end up running into another word that already existed in the crossword, and ran in the same direction. This bug was only observed once in manual testing, and a screenshot was taken to enable analysis later. It turned out to be caused by an assumption that words would only intersect other words that ran orthogonal to themselves. This is almost always true, but it is possible for a word, for instance, to run down a column and collide with another that shares the same column. The last letter of the first could have been the first letter of the second, which turns them into one compound word
 
 The bug was solved by checking that the orientation of the intersecting word was in fact orthogonal to the candidate word. This required the addition of another grid to the Crossword class, `Crossword.letter_use`, which recorded whether each letter in the grid was being used by an across word, a down word, both, or neither.
 
-#### Remaining Bugs
-### Validator Testing
+## Remaining Bugs
+There are no outstanding bugs in the project. 
+## Validator Testing
+
+## Libraries and Programs Used
+1. [Lucid](https://www.lucidchart.com/pages/)
+    - Lucid charts were used to create the execution path diagrams.
+2. [Heroku](https://www.heroku.com/)
+    - Heroku was used to deploy the project
+3. [Git](https://git-scm.com/)
+    - Version control was implemented using Git through the Github terminal.
+4. [Github](https://github.com/)
+    - Github was used to store the projects after being pushed from Git and its cloud service [Github Pages](https://pages.github.com/) was used to serve the project on the web.
+5. [Visual Studio Code](https://code.visualstudio.com/)
+    - VS Code was used locally as the main IDE environment, primarily because it was easier to set up a development environment locally than in GitPod (I wasn't sure how to persist the Jest installation across different GitPod sessions)
 
 ## Deployment
 
