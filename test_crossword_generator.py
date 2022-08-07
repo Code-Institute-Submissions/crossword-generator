@@ -10,8 +10,7 @@ def blank_crossword():
                                 word_dict, empty=True)
     return blank_crossword
 
-def test_blank_crossword_contains_no_clues():
-    crossword = blank_crossword()
-    clue_count_across = len(crossword.clues_across)
-    clue_count_down = len(crossword.clues_down)
+def test_blank_crossword_contains_no_clues(blank_crossword):
+    clue_count_across = len(blank_crossword.clues_across)
+    clue_count_down = len(blank_crossword.clues_down)
     assert(clue_count_across == 0 and clue_count_down == 0)
