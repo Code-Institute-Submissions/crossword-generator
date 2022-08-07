@@ -1,4 +1,4 @@
-from code.constants import AnsiCommands, Colors
+from constants import AnsiCommands, Colors
 import sys
 
 class Word:

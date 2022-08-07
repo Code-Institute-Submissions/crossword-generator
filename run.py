@@ -1,9 +1,9 @@
 import sys
 import json
-from code.crossword_generator import Crossword
-from code.utilities import draw_string, get_move_cursor_string, get_alternating_square_color
-from code.constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
-from code.crossword_validator import validate
+from crossword_generator import Crossword
+from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
+from constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
+from crossword_validator import validate
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24

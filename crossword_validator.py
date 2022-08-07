@@ -1,7 +1,7 @@
 import json
 import sys
-from code.constants import AnsiCommands, Orientation
-from code.crossword_generator import Crossword
+from constants import AnsiCommands, Orientation
+from crossword_generator import Crossword
 
 def main():
     """Main entry point for the program"""

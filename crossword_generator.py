@@ -1,8 +1,8 @@
 import random
 import sys
 from time import sleep
-from code.constants import LetterUse, Orientation, get_large_letter, Colors, AnsiCommands
-from code.utilities import Word, Clue, find_matches, get_alternating_square_color, get_move_cursor_string
+from constants import LetterUse, Orientation, get_large_letter, Colors, AnsiCommands
+from utilities import Word, Clue, find_matches, get_alternating_square_color, get_move_cursor_string
 
 class Crossword:
     """Represents a crossword object"""
