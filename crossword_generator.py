@@ -35,9 +35,9 @@ class Crossword:
     def generate_words(self):
         """This function generates the words for the crossword"""
 
-        # Create the initial blank string for the first word in the crossword, 
+        # Create the initial blank string for the first word in the crossword,
         # choosing a string oriented across of random length.
-        blank_chars = ['_' for i in range(random.randint(3, self.cols - 1))]
+        blank_chars = ['_' for i in range(random.randint(3, int(self.cols / 2)))]
         blank_string = ''.join(blank_chars)
         
         # Find words matching this initial string, and add it to a random row.
@@ -60,7 +60,7 @@ class Crossword:
                 self._prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-                self.print(True)
+                self.print(show_letters=True)
 
                 # Print the welcome message
                 self.print_welcome_message()
@@ -103,14 +103,16 @@ class Crossword:
         if orientation == Orientation.VERTICAL:
             row = start_row + 1
             while row < self.rows:
-                if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
+                if self._check_cell_is_legal(row, start_col, row + 1,
+                                             start_col, Orientation.VERTICAL):
                     candidate.append(self.grid[row][start_col])
                 else:
                     break
                 row += 1
             row = start_row - 1
             while row >= 0:
-                if self._check_cell_is_legal(row, start_col, Orientation.VERTICAL):
+                if self._check_cell_is_legal(row, start_col, row - 1,
+                                             start_col, Orientation.VERTICAL):
                     candidate.insert(0, self.grid[row][start_col])
 
                     # Move the root row back to match the new legal start to the potential word
@@ -121,14 +123,16 @@ class Crossword:
         elif orientation == Orientation.HORIZONTAL:
             col = start_col + 1
             while col < self.cols:
-                if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
+                if self._check_cell_is_legal(start_row, col, start_row,
+                                             col + 1, Orientation.HORIZONTAL):
                     candidate.append(self.grid[start_row][col])
                 else:
                     break
                 col += 1
             col = start_col - 1
             while col >= 0:
-                if self._check_cell_is_legal(start_row, col, Orientation.HORIZONTAL):
+                if self._check_cell_is_legal(start_row, col, start_row,
+                                             col - 1, Orientation.HORIZONTAL):
                     candidate.insert(0, self.grid[start_row][col])
 
                     # Move the root column back to match the new legal start to the potential word
@@ -139,12 +143,10 @@ class Crossword:
         
         # If the first or last character of the candidate is adjacent to an existing word
         # without intersecting it, remove it.
-        candidate = self.check_for_adjacency(candidate, 
-                                             orientation, 
-                                             start_row, 
-                                             start_col,
-                                             original_row,
-                                             original_col)
+        (candidate, start_row, start_col) = self.check_for_adjacency(candidate, 
+                                                                     orientation, 
+                                                                     start_row, 
+                                                                     start_col)
 
         # Words shorter than three characters cannot connect 2 existing words, so ignore them.
         if len(candidate) < 3:
@@ -188,33 +190,45 @@ class Crossword:
             # No shorter candidates are possible, so return None
             return None
 
-    def check_for_adjacency(self, candidate, orientation, start_row, start_col, original_row, original_col):
+    def check_for_adjacency(self, candidate, orientation, start_row, start_col):
         """Checks that the first and last characters of a candidate clue do not touch
            another clue without intersecting. If they do, the function removes the
            offending character(s)"""
         if orientation == Orientation.HORIZONTAL:
             if start_col > 0 and self.grid[start_row][start_col - 1] != '_':
                 candidate.pop(0)
+                start_col +=1
             at_edge = start_col + len(candidate) >= self.cols
             if not at_edge and self.grid[start_row][start_col + len(candidate)] != '_':
                 candidate.pop()
-            return candidate
+            return (candidate, start_row, start_col)
         elif orientation == Orientation.VERTICAL:
             if start_row > 0 and self.grid[start_row - 1][start_col] != '_':
                 candidate.pop(0)
+                start_row += 1
             at_edge = start_row + len(candidate) >= self.rows
             if not at_edge and self.grid[start_row + len(candidate)][start_col] != '_':
                 candidate.pop()
-            return candidate
+            return (candidate, start_row, start_col)
         
         return candidate
 
-    def _check_cell_is_legal(self, row, col, orientation):
+    def _check_cell_is_legal(self, row, col, next_row, next_col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
 
+        # Check the next cell after this one to ensure that this candidate is not running
+        # into another word running in the same orientation. If it is, return False to
+        # ensure that neither cell will be added.
+        if orientation == Orientation.HORIZONTAL and next_col < self.cols and next_col >= 0:
+            if self.letter_use[row][next_col] == LetterUse.ACROSS:
+                return False
+        elif orientation == Orientation.VERTICAL and next_row < self.rows and next_row >= 0:
+            if self.letter_use[next_row][col] == LetterUse.DOWN:
+                return False
+
         # If this cell already contains a letter, it is already part of a word
-        # running in the orthogonal direction, so it is a legal cell in a potential
-        # new word
+        # running in the orthogonal direction (we've checked for the parallel direction
+        # above), so it is a legal cell in a potential new word,
         if self.grid[row][col] != "_":
             return True
 

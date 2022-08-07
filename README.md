@@ -44,7 +44,9 @@ An object-oriented approach was employed for the process of crossword generation
 ### Bugs
 #### Solved Bugs
 
-A bug was found in the crossword generation algorithm, whereby a word could end up adjacent to another word without intersecting it. This was not present in the original algorithm, which always selected the longest word possible, but was introduced along with a random choice of max length for each word. (The random max length was necessary as crosswords with too many long and difficult clues were being generated). The problem was caused by the probing routine in the `generate_new_word()` function stopping abruptly when the max length was reached, without checking to see if the last cell added was legal or not.
+A bug was found in the crossword generation algorithm, whereby a word could end up running into another word that already existed in the crossword, and ran in the same direction. This bug was only observed once in manual testing, and a screenshot was taken to enable analysis later. It turned out to be caused by an assumption that words would only intersect other words that ran orthogonal to themselves. This is almost always true, but it is possible for a word, for instance, to run down a column and collide with another that shares the same column. The last letter of the first could have been the first letter of the second, which turns them into one compound word
+
+The bug was solved by checking that the orientation of the intersecting word was in fact orthogonal to the candidate word. This required the addition of another grid to the Crossword class, `Crossword.letter_use`, which recorded whether each letter in the grid was being used by an across word, a down word, both, or neither.
 
 #### Remaining Bugs
 ### Validator Testing

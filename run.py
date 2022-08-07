@@ -30,7 +30,7 @@ def main():
             else:
                 word_length_map[length] = []
                 word_length_map[length].append(word)
-    crossword = Crossword(11, 11, word_length_map, word_dict)
+    crossword = Crossword(12, 12, word_length_map, word_dict)
 
     begin_puzzle(crossword)
 
