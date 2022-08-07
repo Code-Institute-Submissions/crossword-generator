@@ -16,6 +16,16 @@ TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 
 def main():
     """Main entry point for the program"""
+    (word_dict, word_length_map) = build_dictionary_and_length_map()
+    
+    crossword = Crossword(12, 12, word_length_map, word_dict)
+    validate(crossword)
+
+    begin_puzzle(crossword)
+
+def build_dictionary_and_length_map():
+    """Import the word dictionary from file, and use it to build
+       a map of words keyed by their lengths"""
     word_length_map = {}
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
         word_dict = json.load(file)
@@ -31,10 +41,7 @@ def main():
             else:
                 word_length_map[length] = []
                 word_length_map[length].append(word)
-    crossword = Crossword(12, 12, word_length_map, word_dict)
-    validate(crossword)
-
-    begin_puzzle(crossword)
+    return (word_dict, word_length_map)
 
 def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""

@@ -6,7 +6,7 @@ from code.utilities import Word, Clue, find_matches, get_alternating_square_colo
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, rows, cols, word_length_map, word_dict):
+    def __init__(self, rows, cols, word_length_map, word_dict, empty=False):
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
@@ -22,15 +22,16 @@ class Crossword:
         # A set is used to prevent duplicate intersections
         self.intersections = set()
         
-        # Generate a random crossword layout
-        self.generate_words()
-        self.reindex_clues()
-        self.selected_clue = self.clues_across[0]
-        row = 8
-        col = 4 + (self.cols * 2) + 6
-        sys.stdout.write(get_move_cursor_string(col, row))
-        sys.stdout.flush()
-        input("Complete! Press a key to continue ...")
+        # If the empty flag is not set to True, generate a random crossword
+        if not empty:
+            self.generate_words()
+            self.reindex_clues()
+            self.selected_clue = self.clues_across[0]
+            row = 8
+            col = 4 + (self.cols * 2) + 6
+            sys.stdout.write(get_move_cursor_string(col, row))
+            sys.stdout.flush()
+            input("Complete! Press a key to continue ...")
 
     def generate_words(self):
         """This function generates the words for the crossword"""
