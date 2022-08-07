@@ -3,6 +3,7 @@ import json
 from crossword_generator import Crossword
 from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
 from constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
+from crossword_validator import validate
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24
@@ -31,6 +32,8 @@ def main():
                 word_length_map[length] = []
                 word_length_map[length].append(word)
     crossword = Crossword(12, 12, word_length_map, word_dict)
+    validate(crossword)
+    sys.exit()
 
     begin_puzzle(crossword)
 

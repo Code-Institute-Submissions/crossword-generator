@@ -30,7 +30,7 @@ class Crossword:
         col = 4 + (self.cols * 2) + 6
         sys.stdout.write(get_move_cursor_string(col, row))
         sys.stdout.flush()
-        input("Press a key to continue ...")
+        # input("Press a key to continue ...")
 
     def generate_words(self):
         """This function generates the words for the crossword"""
@@ -65,8 +65,8 @@ class Crossword:
                 # Print the welcome message
                 self.print_welcome_message()
                 print(self.last_clue_added.string)
-                # sleep(1)
-                input()
+                # sleep(.05)
+                # input()
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
