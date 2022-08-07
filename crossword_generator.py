@@ -197,7 +197,6 @@ class Crossword:
         if orientation == Orientation.HORIZONTAL:
             if start_col > 0 and self.grid[start_row][start_col - 1] != '_':
                 candidate.pop(0)
-                print(f"removing first character of ")
                 start_col +=1
             at_edge = start_col + len(candidate) >= self.cols
             if not at_edge and self.grid[start_row][start_col + len(candidate)] != '_':

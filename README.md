@@ -39,8 +39,19 @@ An object-oriented approach was employed for the process of crossword generation
 ![flowchart for puzzle solver](documentation_images/crossword_puzzle_flow.png)
 
 ## Testing
+Four different testing approaches were used in the project:
+- Manual testing
+- Automated testing
+- In-app testing
+- User story testing
+
 ### Manual Testing
 ### Automated Testing
+### In-app Testing
+It is preferable for automated testing to be deterministic, i.e. for the same tests to be run on the code every time. So, in the automated testing, the same crosswords are used as fixtures each time. Because crosswords are usually generated randomly, it is possible that a given bug, dependent on a particular crossword layout, may not appear when the program is repeatedly tested against the pre-generated crosswords in automated testing.
+
+For this reason, the project contains the python file `crossword_validation.py`, whose `validate(crossword)` method is invoked by `run.py` after a new random crossword is generated. This ensures that the crossword meets several requirements and is a valid crossword that can be solved by the user. The validator also has its own `main()` method, which generates 100 crosswords and validates each one in turn. This feature was included to mitigate the deterministic nature of the automated tests, and ensure that rare or difficult to reproduce bugs would be detectable.
+### User Story Testing
 ### Bugs
 #### Solved Bugs
 
