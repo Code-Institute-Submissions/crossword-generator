@@ -33,7 +33,6 @@ def main():
                 word_length_map[length].append(word)
     crossword = Crossword(12, 12, word_length_map, word_dict)
     validate(crossword)
-    sys.exit()
 
     begin_puzzle(crossword)
 

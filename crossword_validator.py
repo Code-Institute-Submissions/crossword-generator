@@ -43,21 +43,29 @@ def validate(crossword):
     print("Checking for 2x2 groups of occupied cells")
     result = check_for_2x2_groups(crossword)
     if result:
-        print("  All groups valid ...")
+        print("  ... All groups valid")
     else:
         return False
 
     result = check_clue_strings_match_grid(crossword)
     if result:
-        print("  All clues match grid ...")
+        print("  ...All clues match grid")
     else:
         return False
 
     result = check_no_adjacent_clues(crossword)
     if result:
-        print("  No adjacent clues found ...")
-    else: 
+        print("  ...No adjacent clues found")
+    else:
         return False
+
+    result = check_all_clues_appear_in_dictionary(crossword)
+    if result:
+        print("  ...all clues appear in dictionary")
+    else:
+        return False
+
+    return True
 
 def check_for_2x2_groups(crossword):
     """Test ensures that no 2x2 group of contiguous cells are all occupied"""
@@ -127,6 +135,15 @@ def check_no_adjacent_clues(crossword):
                 if crossword.grid[clue.start_row + length][col] != '_':
                     print(f"{clue.string} touches another clue at {clue.start_row + length},{col}")
                     return False
+    return True
+
+def check_all_clues_appear_in_dictionary(crossword):
+    """Test confirms that all clue strings do in fact appear in the dictionary"""
+    clues = crossword.clues_across + crossword.clues_down
+    for clue in clues:
+        if clue.string not in crossword.word_dict:
+            print(f"The clue '{clue.string}' does not appear in the dictionary")
+            return False
     return True
 
 if __name__ == '__main__':
