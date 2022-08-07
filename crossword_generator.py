@@ -143,9 +143,9 @@ class Crossword:
         
         # If the first or last character of the candidate is adjacent to an existing word
         # without intersecting it, remove it.
-        (candidate, start_row, start_col) = self.check_for_adjacency(candidate, 
-                                                                     orientation, 
-                                                                     start_row, 
+        (candidate, start_row, start_col) = self.check_for_adjacency(candidate,
+                                                                     orientation,
+                                                                     start_row,
                                                                      start_col)
 
         # Words shorter than three characters cannot connect 2 existing words, so ignore them.
@@ -197,6 +197,7 @@ class Crossword:
         if orientation == Orientation.HORIZONTAL:
             if start_col > 0 and self.grid[start_row][start_col - 1] != '_':
                 candidate.pop(0)
+                print(f"removing first character of ")
                 start_col +=1
             at_edge = start_col + len(candidate) >= self.cols
             if not at_edge and self.grid[start_row][start_col + len(candidate)] != '_':
@@ -211,7 +212,7 @@ class Crossword:
                 candidate.pop()
             return (candidate, start_row, start_col)
         
-        return candidate
+        return (candidate, start_row, start_col)
 
     def _check_cell_is_legal(self, row, col, next_row, next_col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
@@ -220,10 +221,14 @@ class Crossword:
         # into another word running in the same orientation. If it is, return False to
         # ensure that neither cell will be added.
         if orientation == Orientation.HORIZONTAL and next_col < self.cols and next_col >= 0:
-            if self.letter_use[row][next_col] == LetterUse.ACROSS:
+            across_use = self.letter_use[row][next_col] == LetterUse.ACROSS
+            both_use = self.letter_use[row][next_col] == LetterUse.BOTH
+            if across_use or both_use:
                 return False
         elif orientation == Orientation.VERTICAL and next_row < self.rows and next_row >= 0:
-            if self.letter_use[next_row][col] == LetterUse.DOWN:
+            down_use = self.letter_use[next_row][col] == LetterUse.DOWN
+            both_use = self.letter_use[next_row][col] == LetterUse.BOTH
+            if down_use or both_use:
                 return False
 
         # If this cell already contains a letter, it is already part of a word
