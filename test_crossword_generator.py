@@ -56,3 +56,18 @@ def test_trim_candidate_returns_none_if_original_cell_not_included(blank_puzzle)
     result_horizontal = blank_puzzle.trim_candidate(candidate, orientation, 0, 0,
                                                     0, original_col)
     assert(result_horizontal is None)
+
+def test_check_for_adjacency_removes_first_character(blank_puzzle):
+    """Tests that function removes the first letter of a candidate if it
+       touches another word in the puzzle without intersecting it"""
+    blank_puzzle.grid[0][0] = "x"
+    candidate1 = ["_", "_", "_", "_", "_"]
+    candidate2 = candidate1[:]
+    length = len(candidate1)
+    (result_horizontal, x, y) = blank_puzzle.check_for_adjacency(candidate1,
+                                Orientation.HORIZONTAL, 0, 1)
+    (result_vertical, x, y) = blank_puzzle.check_for_adjacency(candidate2,
+                                Orientation.VERTICAL, 1, 0)
+    len_horizontal = len(result_horizontal)
+    len_vertical = len(result_vertical)
+    assert(len_horizontal == length - 1 and len_vertical == length - 1)
