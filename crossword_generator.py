@@ -59,7 +59,7 @@ class Crossword:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
                 # self.print()
-                self._prune_intersection_set()
+                self.prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
                 if user_present:
@@ -107,7 +107,7 @@ class Crossword:
         if orientation == Orientation.VERTICAL:
             row = start_row + 1
             while row < self.rows:
-                if self._check_cell_is_legal(row, start_col, row + 1,
+                if self.check_cell_is_legal(row, start_col, row + 1,
                                              start_col, Orientation.VERTICAL):
                     candidate.append(self.grid[row][start_col])
                 else:
@@ -115,7 +115,7 @@ class Crossword:
                 row += 1
             row = start_row - 1
             while row >= 0:
-                if self._check_cell_is_legal(row, start_col, row - 1,
+                if self.check_cell_is_legal(row, start_col, row - 1,
                                              start_col, Orientation.VERTICAL):
                     candidate.insert(0, self.grid[row][start_col])
 
@@ -127,7 +127,7 @@ class Crossword:
         elif orientation == Orientation.HORIZONTAL:
             col = start_col + 1
             while col < self.cols:
-                if self._check_cell_is_legal(start_row, col, start_row,
+                if self.check_cell_is_legal(start_row, col, start_row,
                                              col + 1, Orientation.HORIZONTAL):
                     candidate.append(self.grid[start_row][col])
                 else:
@@ -135,7 +135,7 @@ class Crossword:
                 col += 1
             col = start_col - 1
             while col >= 0:
-                if self._check_cell_is_legal(start_row, col, start_row,
+                if self.check_cell_is_legal(start_row, col, start_row,
                                              col - 1, Orientation.HORIZONTAL):
                     candidate.insert(0, self.grid[start_row][col])
 
@@ -221,7 +221,7 @@ class Crossword:
         
         return (candidate, start_row, start_col)
 
-    def _check_cell_is_legal(self, row, col, next_row, next_col, orientation):
+    def check_cell_is_legal(self, row, col, next_row, next_col, orientation):
         """Checks if the cell can be used as part of a new word in the crossword"""
 
         # Check the next cell after this one to ensure that this candidate is not running
@@ -298,8 +298,8 @@ class Crossword:
         if new_orientation == Orientation.VERTICAL:
             end_col = word.start_col + len(word.string) - 1
             while new_start_col < self.cols:
-                cell_above_occupied = self._check_cell_occupied(new_start_row - 1, new_start_col)
-                cell_below_occupied = self._check_cell_occupied(new_start_row + 1, new_start_col)
+                cell_above_occupied = self.check_cell_occupied(new_start_row - 1, new_start_col)
+                cell_below_occupied = self.check_cell_occupied(new_start_row + 1, new_start_col)
                 if not cell_above_occupied and not cell_below_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
                 new_start_col += 1
@@ -308,16 +308,16 @@ class Crossword:
         elif new_orientation == Orientation.HORIZONTAL:
             end_row = word.start_row + len(word.string) - 1
             while new_start_row < self.rows:
-                cell_to_left_occupied = self._check_cell_occupied(new_start_row, new_start_col - 1)
-                cell_to_right_occupied = self._check_cell_occupied(new_start_row, new_start_col + 1)
+                cell_to_left_occupied = self.check_cell_occupied(new_start_row, new_start_col - 1)
+                cell_to_right_occupied = self.check_cell_occupied(new_start_row, new_start_col + 1)
                 if not cell_to_left_occupied and not cell_to_right_occupied:
                     self.intersections.add((new_start_row, new_start_col, new_orientation))
                 new_start_row += 1
                 if new_start_row > end_row:
                     break
 
-    def _check_cell_occupied(self, row, col):
-        """Checks if a cell has been filled with a letter or not. Interprets a cell 
+    def check_cell_occupied(self, row, col):
+        """Checks if a cell has been filled with a letter or not. Interprets a cell
            outside the crossword as being empty"""
         if row < 0 or col < 0 or row >= self.rows or col >= self.cols:
             return False
@@ -325,7 +325,7 @@ class Crossword:
             return False
         return True
 
-    def _prune_intersection_set(self):
+    def prune_intersection_set(self):
         """Removes an intersection from the intersection set if the cell before or after
            it is unusable (already occupied or out of range). This prevents new words being
            added that abut, but do not intersect, existing words in the crossword"""
