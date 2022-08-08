@@ -26,7 +26,7 @@ def main():
         sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
         sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
         print(f"Testing number {counter}")
-        crossword = Crossword(12, 12, word_length_map, word_dict)
+        crossword = Crossword(12, 12, word_length_map, word_dict, user_present=True)
         result = validate(crossword)
         if result is False:
             print(f"problem at iteration {counter}")

@@ -6,7 +6,7 @@ from utilities import Word, Clue, find_matches, get_alternating_square_color, ge
 
 class Crossword:
     """Represents a crossword object"""
-    def __init__(self, rows, cols, word_length_map, word_dict, empty=False):
+    def __init__(self, rows, cols, word_length_map, word_dict, empty=False, user_present=True):
         self.cols = cols
         self.rows = rows
         self.grid = [["_" for i in range(rows)] for j in range(cols)]
@@ -24,16 +24,17 @@ class Crossword:
         
         # If the empty flag is not set to True, generate a random crossword
         if not empty:
-            self.generate_words()
+            self.generate_words(user_present)
             self.reindex_clues()
             self.selected_clue = self.clues_across[0]
             row = 8
             col = 4 + (self.cols * 2) + 6
             sys.stdout.write(get_move_cursor_string(col, row))
             sys.stdout.flush()
-            input("Complete! Press a key to continue ...")
+            if user_present:
+                input("Complete! Press a key to continue ...")
 
-    def generate_words(self):
+    def generate_words(self, user_present=True):
         """This function generates the words for the crossword"""
 
         # Create the initial blank string for the first word in the crossword,
@@ -57,15 +58,19 @@ class Crossword:
             if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
-                self.print()
+                # self.print()
                 self._prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-                self.print(show_letters=False)
+                if user_present:
+                    self.print(show_letters=False)
+                else:
+                    self.print(show_letters=True)
 
                 # Print the welcome message
                 self.print_welcome_message()
-                sleep(.2)
+                if user_present:
+                    sleep(.2)
 
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of clues"""
@@ -169,10 +174,14 @@ class Crossword:
         choice = random.choice(matches)
         return Word(orientation, choice, start_row, start_col)
 
-    def trim_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
+    def trim_candidate(self, candidate, orientation, start_row,
+                       start_col, original_row, original_col):
+        """Reduces the length of the candidate, while ensuring that the candidate remains legal.
+           Returns None if the length would drop below three, or the original intersection cell
+           would no longer be included"""
         if orientation == Orientation.HORIZONTAL:
             # 3 is the minimum word length, and the word must include the original intersection
-            while len(candidate) > 3 and start_col + len(candidate) > original_col:
+            while len(candidate) > 3 and start_col + len(candidate) > original_col + 1:
                 # While cells can still be removed, remove the last one. If it is empty,
                 # then this new candidate does not abut an existing word, so return it
                 removed_cell = candidate.pop()
@@ -182,7 +191,7 @@ class Crossword:
             return None
         elif orientation == Orientation.VERTICAL:
             # 3 is the minimum word length, and the word must include the original intersection
-            while len(candidate) > 3 and start_row + len(candidate) > original_row:
+            while len(candidate) > 3 and start_row + len(candidate) > original_row + 1:
                 removed_cell = candidate.pop()
                 if removed_cell == '_':
                     return candidate

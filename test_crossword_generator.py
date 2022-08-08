@@ -46,3 +46,13 @@ def test_trim_candidate_returns_none_for_original_cell_as_last_char(blank_puzzle
     result_horizontal = blank_puzzle.trim_candidate(candidate, Orientation.HORIZONTAL,
                                                     0, 0, 0, 4)
     assert(result_horizontal is None)
+
+def test_trim_candidate_returns_none_if_original_cell_not_included(blank_puzzle):
+    """Tests that the function returns None if a candidate cannot be shortened
+       without removing the original intersection cell"""
+    candidate = ["_", "_", "_", "_", "_"]
+    orientation = Orientation.HORIZONTAL
+    original_col = 4
+    result_horizontal = blank_puzzle.trim_candidate(candidate, orientation, 0, 0,
+                                                    0, original_col)
+    assert(result_horizontal is None)
