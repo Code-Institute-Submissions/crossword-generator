@@ -155,7 +155,7 @@ class Crossword:
         # If there is no match, try removing characters from the candidate and finding new matches
         # If no shorter candidate is possible, return None and forget this intersection point
         while len(matches) == 0:
-            shorter_candidate = self._get_shorter_candidate(
+            shorter_candidate = self.trim_candidate(
                                         candidate,
                                         orientation,
                                         start_row,
@@ -169,7 +169,7 @@ class Crossword:
         choice = random.choice(matches)
         return Word(orientation, choice, start_row, start_col)
 
-    def _get_shorter_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
+    def trim_candidate(self, candidate, orientation, start_row, start_col, original_row, original_col):
         if orientation == Orientation.HORIZONTAL:
             # 3 is the minimum word length, and the word must include the original intersection
             while len(candidate) > 3 and start_col + len(candidate) > original_col:
