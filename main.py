@@ -1,5 +1,6 @@
 import json
 
+
 def main():
     """Assembles the word list and the frequency list, and uses these to
        create a dictionary keyed by word, with a list of frequency and
@@ -10,7 +11,7 @@ def main():
     frequency_dict = load_word_frequencies()
     frequency_keys = frequency_dict.keys()
     print(f"Frequency dict loaded with {len(frequency_keys)} entries")
-    
+
     # Words in the word_list are often duplicated, with differing definitions.
     # Create a dictionary with words as keys, and a list (containing both the
     # frequency of the word and a list of its definitions) as the value
@@ -34,26 +35,32 @@ def main():
             word_dict[word][1].append(definition)
             unique_count += 1
             total_count += 1
-            
+
         else:
             word_dict[word][1].append(definition)
             total_count += 1
         previous_word = word
 
-    print(f"Dictionary created : {unique_count} unique, {total_count} total, {not_in_freq_dict_count} not in frequency dict")
+    print(
+        f"Dictionary created : {unique_count} unique, {total_count} total,"
+        f"{not_in_freq_dict_count} not in frequency dict")
 
     try:
-        with open('data/crossword_dictionary.json', 'w', encoding='utf-8') as outfile:
+        with open('data/crossword_dictionary.json',
+                  'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(word_dict, indent=4))
     except FileExistsError:
-        print("Skipping file creation - 'data/crossword_dictionary.json' already exists")
-    
+        print("Skipping file creation - 'data/crossword_dictionary.json'"
+              "already exists")
+
+
 def load_word_frequencies():
     """Loads the wikipedia word frequency file and reads all the entries that
        have a frequency of more than 500, then saves these entries to a new
        file."""
     freq_dict = {}
-    with open('data/enwiki-20210820-words-frequency.txt', 'r', encoding='utf-8') as infile:
+    with open('data/enwiki-20210820-words-frequency.txt',
+              'r', encoding='utf-8') as infile:
         for line in infile:
             elements = line.split(' ')
             frequency = int(elements[1].replace('\n', ''))
@@ -63,14 +70,16 @@ def load_word_frequencies():
                 break
 
     try:
-        with open('data/wiki-words-freq1000+.txt', 'x', encoding='utf-8') as outfile:
+        with open('data/wiki-words-freq1000+.txt',
+                  'x', encoding='utf-8') as outfile:
             for key, value in freq_dict.items():
                 outfile.writelines(f"{key} {value}\n")
     except FileExistsError:
-        print("Skipping file creation - 'data/wiki-words-freq1000+.txt' already exists")
+        print("Skipping file creation - 'data/wiki-words-freq1000+.txt'"
+              " already exists")
 
-    
     return freq_dict
+
 
 def load_large_dictionary():
     """Loads the source dictionary and removes illegal words. Saves the
@@ -104,32 +113,36 @@ def load_large_dictionary():
                 of_count += 1
                 continue
 
-            # Exclude all definitions that contain the word itself - These result 
-            # in pretty easy clues!
+            # Exclude all definitions that contain the word itself - These
+            # result in pretty easy clues!
             if word.lower() in definition.lower():
-                print(f"Invalid (contains word itself) : ({word}) {definition}")
+                print(f"Invalid (contains word itself) : ({word}) "
+                      f"{definition}")
                 contains_word_count += 1
                 continue
-            
+
             # Ensure that the words contain the letters a-z only
             if word.isalpha() and '-' not in word and "\'" not in word:
                 word_list.append((word.lower(), definition))
 
     word_list.sort()
 
-    # Write the sorted list of tuples to a new file. In order to avoid confusion,
-    # use the pipe '|' instead of the comma ',' as separator.
+    # Write the sorted list of tuples to a new file. In order to avoid
+    # confusion, use the pipe '|' instead of the comma ',' as separator.
     try:
-        with open('data/large_dict_words_only.txt', 'w', encoding='utf-8') as write_file:
+        with open('data/large_dict_words_only.txt',
+                  'w', encoding='utf-8') as write_file:
             for word in word_list:
                 write_file.writelines(f"{word[0]}|{word[1]}\n")
     except FileExistsError:
-        print("Skipping file creation - 'data/large_dictionary.txt' already exists")
+        print("Skipping file creation - 'data/large_dictionary.txt' already"
+              "exists")
 
     print(f"Of exclusions : {of_count}")
     print(f"Contains word exclusions : {contains_word_count}")
 
     return word_list
+
 
 if __name__ == '__main__':
     main()

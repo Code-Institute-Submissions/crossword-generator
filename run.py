@@ -335,7 +335,7 @@ def parse_command(command, crossword, current_view):
     # reached.
     if command == '?':
         clue = crossword.selected_clue
-        if len() == 1:
+        if len(clue.definitions) == 1:
             return "There's only one clue for that word!"
         index = clue.current_definition
         index += 1
