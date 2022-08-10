@@ -49,15 +49,25 @@ There were two distinct development phases in this project, with the first phase
 The second phase involved writing the code to generate the crossword, and allow the user to enter their guesses on the crossword grid.
 
 ## Data Model
+There are two independent aspects to the Data Model used:
+1. The assembly of a dictionary of words; the raw material for the crossword generator
+2. The internal structure of the Crossword class, and the Clue and Word classes that it employs
+### 1: Dictionary containing words, frequencies and definitions
+The data assembled in the initial stage of development was saved to file in json format, to enable easy 
+cross-platform future use and avoid tightly coupling the word dictionary to the particular code in this 
+project.
 
-The data assembled in the initial stage of development was saved to file in json format, to enable easy cross-platform future use and avoid tightly coupling the word dictionary to the particular code in this project.
-
-Next, the json file was read into a format that could be used by the Python code. The imported data was organised into 2 python dictionaries. 
+Next, the json file was read into a format that could be used by the Python code. The imported data 
+was organised into 2 python dictionaries. 
 - The first was dict_by_length, which had as keys the set of all lengths of the words in the source data. The value for each key is a list containing all the words (as strings) of that length.
 - The second was word_dict, which has as keys the set of all possible words. The value here for each was a list whose first element was the word frequency, and whose second element was a nested list of the possible definitions of that word.
 
 An object-oriented approach was employed for the process of crossword generation. The concepts of Word, Clue, and Crossword were encapsulated in their own respective classes. The Crossword class is the most complex of these, as it is responsible for the task of generating legal crossword puzzles within a set of constraints.
 
+### 2: Crossword, Clue and Word classes
+-   The Crossword class is composed of the following data structures.
+    - **crossword.grid** A 2-dimensional array of characters, with values as follows.
+    Unused squares are represented by a '_'
 
 
 ## Execution Paths
@@ -75,6 +85,11 @@ Four different testing approaches were used in the project:
 
 ## Manual Testing
 ## Automated Testing
+Automated testing was added using the pytest library. Due to time constraints, I concentrated on testing the functions
+in the Crossword class, as these are the most opaque and hard to debug, given that they involve manipulation
+of multi-dimensional arrays. The tests were written after the code was completed, and it was clear that I 
+could have saved a lot of time had I written the tests along with the code, rather than debugging the code
+based on the outputted crosswords. I intend to test along with writing the code in the remaining projects.
 ## In-app Testing
 It is preferable for automated testing to be deterministic, i.e. for the same tests to be run on the code every time. So, in the automated testing, the same crosswords are used as fixtures each time. Because crosswords are usually generated randomly, it is possible that a given bug, dependent on a particular crossword layout, may not appear when the program is repeatedly tested against the pre-generated crosswords in automated testing.
 
@@ -112,8 +127,20 @@ There are no outstanding bugs in the project.
     - Github was used to store the projects after being pushed from Git and its cloud service [Github Pages](https://pages.github.com/) was used to serve the project on the web.
 5. [Visual Studio Code](https://code.visualstudio.com/)
     - VS Code was used locally as the main IDE environment, primarily because it was easier to set up a development environment locally than in GitPod (I wasn't sure how to persist the Jest installation across different GitPod sessions)
+6. [PyCharm-Community](https://www.jetbrains.com/pycharm/)
+    - I switched to PyCharm towards the end of the project, as it has better support for PEP8 compliance.
+7. [pytest](https://docs.pytest.org/en/7.1.x/)
+    - Pytest was used for automated testing.
 
 ## Deployment
+The project was deployed using Code Institute's mock terminal for Heroku. In order to deploy the project
+yourself, you can follow this procedure:
+- Clone this repository using the following command
+    - `git clone 'https://github.com/johnrearden/crossword-generator.git'`
+- Create a new Heroku app
+- Set the buildpacks to Python and NodeJS (order is important)
+- Link your Heroku app to the repository
+- Click on `DEPLOY`
 
 ## Credits
 - Code Institute for the deployment terminal
