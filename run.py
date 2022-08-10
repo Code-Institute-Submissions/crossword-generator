@@ -7,8 +7,10 @@ the user input loop to let the user attempt the puzzle
 import sys
 import json
 from crossword_generator import Crossword
-from utilities import draw_string, get_move_cursor_string, get_alternating_square_color
-from constants import AnsiCommands, Colors, UniChars, Orientation, ViewType, get_large_letter
+from utilities import (draw_string, get_move_cursor_string,
+                       get_alternating_square_color)
+from constants import (AnsiCommands, Colors, UniChars, Orientation, ViewType,
+                       get_large_letter)
 from crossword_validator import validate
 
 TERMINAL_WIDTH = 80
@@ -20,6 +22,7 @@ MEDIUM_GRAY = Colors.get_background_color(180, 180, 180)
 DARK_GRAY = Colors.get_background_color(40, 40, 40)
 TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 
+
 def main():
     """Main entry point for the program"""
     (word_dict, word_length_map) = build_dictionary_and_length_map()
@@ -28,6 +31,7 @@ def main():
 
     begin_puzzle(crossword)
 
+
 def build_dictionary_and_length_map():
     """Import the word dictionary from file, and use it to build
        a map of words keyed by their lengths"""
@@ -35,9 +39,9 @@ def build_dictionary_and_length_map():
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
         word_dict = json.load(file)
 
-        # Build a python dictionary with word lengths as keys, and lists of words of
-        # that length as values. The dictionary is used to search for matching
-        # partial words
+        # Build a python dictionary with word lengths as keys, and lists of
+        # words of that length as values. The dictionary is used to search for
+        # matching partial words
         for word in word_dict.keys():
             word = word.replace('\n', '')
             length = len(word)
@@ -47,6 +51,7 @@ def build_dictionary_and_length_map():
                 word_length_map[length] = []
                 word_length_map[length].append(word)
     return (word_dict, word_length_map)
+
 
 def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""
@@ -69,8 +74,11 @@ def begin_puzzle(crossword):
             # requesting a clue to be displayed
             result = parse_command(command, crossword, current_view)
             user_message = f"{AnsiCommands.CLEAR_LINE}{result}"
-            draw_string(user_message, 0, TERMINAL_HEIGHT, [Colors.FOREGROUND_RED])
-        else :
+            draw_string(user_message,
+                        0,
+                        TERMINAL_HEIGHT,
+                        [Colors.FOREGROUND_RED])
+        else:
             # The user is toggling through the views
             current_view = current_view.next()
             if current_view == ViewType.CROSSWORD:
@@ -83,6 +91,7 @@ def begin_puzzle(crossword):
             elif current_view == ViewType.INSTRUCTIONS:
                 display_instructions(current_view)
 
+
 def display_instructions(current_view):
     """Prints the instructions to the display"""
     style = (
@@ -93,18 +102,24 @@ def display_instructions(current_view):
     draw_string(style + title, 0, 2, [])
     style = f"{AnsiCommands.NORMAL}"
     para1 = (
-    " There are two crossword puzzles next to each other on the main page. The\n"
-    " puzzle on the left just shows the clue numbers in the starting square of each\n"
-    " clue. The puzzle on the right show the answers that you've already entered.\n\n"
-    " Pressing enter repeatedly allow you to tab through the 4 views\n\n"
-    "   1) The main game view, showing the 2 crosswords and the current clue\n"
-    "   2) All of the Across clues\n"
-    "   3) All of the Down clues\n"
-    "   4) This instructions page again!\n\n"
-    " To enter your answer for the current clue, simply type it into the terminal\n\n"
-    " To switch to another clue, enter its description, e.g. '2 across' or '7 down'.\n")
+        " There are two crossword puzzles next to each other on the main page."
+        "\n"
+        " The puzzle on the left just shows the clue numbers in the starting\n"
+        " square of each clue. The puzzle on the right show the answers that\n"
+        " you've already entered.\n\n"
+        " Pressing enter repeatedly allow you to tab through the 4 views\n\n"
+        "   1) The main game view, showing the 2 crosswords and the current"
+        " clue\n"
+        "   2) All of the Across clues\n"
+        "   3) All of the Down clues\n"
+        "   4) This instructions page again!\n\n"
+        " To enter your answer for the current clue, simply type it into the"
+        " terminal\n\n"
+        " To switch to another clue, enter its description, e.g. '2 across' or"
+        " '7 down'.\n")
     draw_string(style + para1, 0, 4, [])
     print_view_type_bar(current_view)
+
 
 def display_crossword(crossword, current_view):
     """Print the crossword to the screen"""
@@ -153,7 +168,8 @@ def display_crossword(crossword, current_view):
                 else:
                     char = get_large_letter(user_guess)
                 color = get_alternating_square_color(i, j)
-                output = f"{color}{TEXT_COLOR}{char}{AnsiCommands.DEFAULT_COLOR}"
+                output = (f"{color}{TEXT_COLOR}{char}"
+                          f"{AnsiCommands.DEFAULT_COLOR}")
                 sys.stdout.write(output)
     sys.stdout.flush()
 
@@ -195,6 +211,7 @@ def display_crossword(crossword, current_view):
 
     print_view_type_bar(current_view)
 
+
 def display_clues(crossword, orientation, current_view):
     """Print the clues to the screen"""
     start_col = 1
@@ -224,6 +241,7 @@ def display_clues(crossword, orientation, current_view):
                   f" ({len(clue.string)}) {clue.definitions[0]}")
 
     print_view_type_bar(current_view)
+
 
 def highlight_single_clue(crossword):
     """Highlight the position of one clue on the crossword puzzle, and print
@@ -277,16 +295,18 @@ def highlight_single_clue(crossword):
         for offset, _ in enumerate(clue.string):
             back = Colors.BACKGROUND_ORANGE
             fore = Colors.FOREGROUND_WHITE
-            guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
-            char_to_display = "  " if guess_char == "*" else get_large_letter(guess_char)
-            draw_string(char_to_display, x_coord + offset * 2, y_coord, [fore, back])
+            col = clue.start_col + offset
+            guess = crossword.user_guesses[clue.start_row][col]
+            char = "  " if guess == "*" else get_large_letter(guess)
+            draw_string(char, x_coord + offset * 2, y_coord, [fore, back])
     elif clue.orientation == Orientation.VERTICAL:
         for offset, _ in enumerate(clue.string):
             back = Colors.BACKGROUND_ORANGE
             fore = Colors.FOREGROUND_WHITE
-            guess_char = crossword.user_guesses[clue.start_row + offset][clue.start_col]
-            char_to_display = "  " if guess_char == "*" else get_large_letter(guess_char)
-            draw_string(char_to_display, x_coord, y_coord + offset, [back, fore])
+            row = clue.start_row + offset
+            guess = crossword.user_guesses[row][clue.start_col]
+            char = "  " if guess == "*" else get_large_letter(guess)
+            draw_string(char, x_coord, y_coord + offset, [back, fore])
 
     # Print the clue text just below the views of the crossword puzzle
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
@@ -298,18 +318,21 @@ def highlight_single_clue(crossword):
     string = (
         f"{Colors.FOREGROUND_ORANGE}{clue.index} {orientation} "
         f"{Colors.FOREGROUND_YELLOW}({length}) "
-        f"{Colors.FOREGROUND_ORANGE}{clue.definitions[clue.current_definition]}")
+        f"{Colors.FOREGROUND_ORANGE}"
+        f"{clue.definitions[clue.current_definition]}")
     sys.stdout.write(string)
     sys.stdout.write(AnsiCommands.DEFAULT_COLOR)
     sys.stdout.flush()
+
 
 def parse_command(command, crossword, current_view):
     """Parse a command entered by the user. This can be either a request
        to display a different clue, or a solution to the clue currently
        displayed"""
 
-    # If the command is just a single question mark, iterate through this clue's
-    # definitions, returning to the first one if the end of the list is reached
+    # If the command is just a single question mark, iterate through this
+    # clue's definitions, returning to the first one if the end of the list is
+    # reached.
     if command == '?':
         clue = crossword.selected_clue
         if len() == 1:
@@ -368,17 +391,17 @@ def parse_command(command, crossword, current_view):
         clue = crossword.selected_clue
         for i, char in enumerate(word):
             if clue.orientation == Orientation.HORIZONTAL:
-                crossword.user_guesses[clue.start_row][clue.start_col + i] = char
+                col = clue.start_col + i
+                crossword.user_guesses[clue.start_row][col] = char
             else:
-                crossword.user_guesses[clue.start_row + i][clue.start_col] = char
+                row = clue.start_row + i
+                crossword.user_guesses[row][clue.start_col] = char
         display_crossword(crossword, current_view)
 
         if check_crossword_complete(crossword):
             return "You've cracked it! The crossword is completed!"
-        else:
-            return "Not finished yet, young apprentice."
+        return "Not finished yet, young apprentice."
 
-        return f"Entered your guess : {word}"
 
 def check_crossword_complete(crossword):
     """Checks each clue's characters against the user_guesses grid, and returns
@@ -388,14 +411,17 @@ def check_crossword_complete(crossword):
     for clue in all_clues:
         for offset, char in enumerate(clue.string):
             if clue.orientation == Orientation.HORIZONTAL:
-                guess_char = crossword.user_guesses[clue.start_row][clue.start_col + offset]
+                col = clue.start_col + offset
+                guess_char = crossword.user_guesses[clue.start_row][col]
                 if char != guess_char:
                     return False
             else:
-                guess_char = crossword.user_guesses[clue.start_row + offset][clue.start_col]
+                row = clue.start_row + offset
+                guess_char = crossword.user_guesses[row][clue.start_col]
                 if char != guess_char:
                     return False
     return True
+
 
 def print_view_type_bar(current_view, in_flow=False):
     """Display the ViewType selection bar at the bottom of the display"""
