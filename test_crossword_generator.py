@@ -3,12 +3,29 @@ from run import build_dictionary_and_length_map
 
 import pytest
 from constants import LetterUse, Orientation
+from utilities import Clue
 
 @pytest.fixture
 def blank_puzzle():
+    """A crossword containing only empty cells"""
     (word_dict, word_length_map) = build_dictionary_and_length_map()
     return Crossword(7, 7, word_length_map,
                                 word_dict, empty=True)
+
+@pytest.fixture
+def puzzle_w_clues(blank_puzzle):
+    """A empty crossword with six dummy clues, 2 of which share the same
+       start cell"""
+    clues_across = [Clue("x", 0, Orientation.HORIZONTAL, [],  0, 0),
+                   Clue("x", 1, Orientation.HORIZONTAL, [],  3, 0),
+                   Clue("x", 2, Orientation.HORIZONTAL, [], 5, 0)]
+    clues_down = [Clue("x", 0, Orientation.VERTICAL, [], 0, 4),
+                  Clue("x", 1, Orientation.VERTICAL, [], 3, 4),
+                  Clue("x", 2, Orientation.VERTICAL, [], 0, 0),]
+    blank_puzzle.clues_across = clues_across
+    blank_puzzle.clues_down = clues_down
+    return blank_puzzle
+
 
 def test_blank_crossword_contains_no_clues(blank_puzzle):
     """Tests that the crossword fixture used here has no clues"""
@@ -113,3 +130,64 @@ def test_check_cell_occupied_fails_for_out_of_bounds_cell(blank_puzzle):
     """Tests that the function returns False if the row or column
        specified are not within the crossword"""
     assert(blank_puzzle.check_cell_occupied(0, 10) is False)
+
+def test_check_cell_occupied_returns_true_for_occupied_cell(blank_puzzle):
+    """Checks that a cell that is occupied will return a True result"""
+    blank_puzzle.grid[0][0] = "x"
+    assert(blank_puzzle.check_cell_occupied(0, 0) is True)
+
+def test_prune_intersection_set_removes_unusable_intersection_cell(blank_puzzle):
+    """Supplied the function with a set containing one point adjacent to an 
+       occupied cell, and tests that the set returned by the function is empty"""
+    blank_puzzle.grid[2][2] = "x"
+    intersection_hor = (2, 1, Orientation.HORIZONTAL)
+    intersection_ver = (1, 2, Orientation.VERTICAL)
+    blank_puzzle.intersections.add(intersection_hor)
+    blank_puzzle.intersections.add(intersection_ver)
+    blank_puzzle.prune_intersection_set()
+    assert(len(blank_puzzle.intersections) == 0)
+
+def test_prune_intersection_set_retains_intersections_at_edge_of_puzzle(blank_puzzle):
+    """Invokes the function with an intersection at each of the 4 edges of
+       the puzzle and checks that the intersection set contains the same 4
+       after invocation"""
+    blank_puzzle.intersections.add((0, 3, Orientation.VERTICAL))
+    blank_puzzle.intersections.add((0, 6, Orientation.VERTICAL))
+    blank_puzzle.intersections.add((3, 0, Orientation.HORIZONTAL))
+    blank_puzzle.intersections.add((3, 6, Orientation.HORIZONTAL))
+    copy_set = set(blank_puzzle.intersections)
+    blank_puzzle.prune_intersection_set()
+    assert(copy_set == blank_puzzle.intersections)
+
+def test_reindex_clues_gives_same_index_to_clues_starting_in_same_cell(puzzle_w_clues):
+    """Checks that clues that share the same starting cell have the same index
+       after function is called. The fixture puzzle_w_clues is set up to have one 
+       such pair of clues"""
+    puzzle_w_clues.reindex_clues()
+    index_shared = True
+    for clue_a in puzzle_w_clues.clues_across:
+        for clue_d in puzzle_w_clues.clues_down:
+            if clue_a.start_row == clue_d.start_row and clue_a.start_col == clue_d.start_col:
+                if clue_a.index != clue_d.index:
+                    index_shared = False
+    assert(index_shared is True)
+
+def test_reindex_clues_gives_consecutive_indices_to_clues(puzzle_w_clues):
+    """Calls function, and then checks to ensure that the clues of each orientation
+       respectively are indexed from zero without missing any numbers"""
+    # clue indices start at 1, as they are shown to the user
+    ordinals = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    puzzle_w_clues.reindex_clues()
+
+    # create a set with the indices that should occur
+    clues_across_count = len(puzzle_w_clues.clues_across)
+    clues_down_count = len(puzzle_w_clues.clues_down)
+    across_indices_set = set(ordinals[:clues_across_count])
+    down_indices_set = set(ordinals[:clues_down_count])
+
+    # create a set with the indices that actually occur after function call
+    result_across_set = {clue.index for clue in puzzle_w_clues.clues_across}
+    result_down_set = {clue.index for clue in puzzle_w_clues.clues_down}
+
+    # assert that the sets are equal(contain same elements)
+    assert(across_indices_set == result_across_set and down_indices_set == result_down_set)

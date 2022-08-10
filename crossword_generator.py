@@ -328,7 +328,7 @@ class Crossword:
     def prune_intersection_set(self):
         """Removes an intersection from the intersection set if the cell before or after
            it is unusable (already occupied or out of range). This prevents new words being
-           added that abut, but do not intersect, existing words in the crossword"""
+           added that touch, but do not intersect, existing words in the crossword"""
         temp_set = set()
         for item in self.intersections:
             (row, col, orientation) = item
@@ -352,7 +352,8 @@ class Crossword:
                     cell_before_occupied = True
                 if row < self.rows - 2 and self.grid[row + 1][col] != '_':
                     cell_after_occupied = True
-
+            
+            # Both cells must be usable in order for an intersection to be retained
             if not cell_before_occupied and not cell_after_occupied:
                 temp_set.add(item)
         self.intersections = temp_set
