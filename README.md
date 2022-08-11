@@ -4,6 +4,14 @@ A python project that creates random crossword puzzles, and then allows the user
 to solve them using a command line interface.
 
 ## Screenshots
+<details>
+<summary>Click to expand</summary>
+
+![Screenshot of the 2 puzzles view](documentation_images/two_puzzle_screenshot.png)
+![Screenshot of the clues across view](documentation_images/clues_across_screenshot.png)
+![Screenshot of the clues down view](documentation_images/clues_down_screenshot.png)
+![Screenshot of the instructions view](documentation_images/instructions_screenshot.png)
+</details>
 
 ## How to play
 
