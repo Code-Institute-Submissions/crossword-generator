@@ -4,8 +4,10 @@ from time import sleep
 from constants import LetterUse, Orientation, get_large_letter, Colors, AnsiCommands
 from utilities import Word, Clue, find_matches, get_alternating_square_color, get_move_cursor_string
 
+
 class Crossword:
     """Represents a crossword object"""
+
     def __init__(self, rows, cols, word_length_map, word_dict, empty=False, user_present=True):
         self.cols = cols
         self.rows = rows
@@ -17,11 +19,10 @@ class Crossword:
         self.clues_across = []
         self.clues_down = []
         self.selected_clue = None
-        self.last_clue_added = None
 
         # A set is used to prevent duplicate intersections
         self.intersections = set()
-        
+
         # If the empty flag is not set to True, generate a random crossword
         if not empty:
             self.generate_words(user_present)
@@ -41,7 +42,7 @@ class Crossword:
         # choosing a string oriented across of random length.
         blank_chars = ['_' for i in range(random.randint(3, int(self.cols / 2)))]
         blank_string = ''.join(blank_chars)
-        
+
         # Find words matching this initial string, and add it to a random row.
         matches = find_matches(blank_string, self.word_length_map, self.word_dict)
         choice = matches[0]
@@ -49,12 +50,11 @@ class Crossword:
         first_word = Word(Orientation.HORIZONTAL, choice, random_row, 0)
         self.add_word_to_grid(first_word)
         self.add_word_to_clues(first_word)
-        
+
         # Loop that generates all subsequent words. Each time a word is generated,
         # one intersection is removed, and more are added. Not all of these are usable.
         while len(self.intersections) > 0:
             next_word = self._generate_new_word()
-            self.last_clue_added = next_word
             if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
@@ -76,10 +76,12 @@ class Crossword:
         """Derive a clue from the word provided, and add it to the list of clues"""
         definitions = self.word_dict[word.string][1]
         if word.orientation == Orientation.HORIZONTAL:
-            clue = Clue(word.string, len(self.clues_across) + 1, word.orientation, definitions, word.start_row, word.start_col)
+            clue = Clue(word.string, len(self.clues_across) + 1, word.orientation, definitions, word.start_row,
+                        word.start_col)
             self.clues_across.append(clue)
         else:
-            clue = Clue(word.string, len(self.clues_down) + 1, word.orientation, definitions, word.start_row, word.start_col)
+            clue = Clue(word.string, len(self.clues_down) + 1, word.orientation, definitions, word.start_row,
+                        word.start_col)
             self.clues_down.append(clue)
 
     def _generate_new_word(self):
@@ -101,14 +103,14 @@ class Crossword:
         # add the character at the intersection point to it
         candidate = []
         candidate.append(self.grid[original_row][original_col])
-        
+
         # Probe the existing crossword grid forwards, and then backwards, to generate
         # the longest possible word less than max_length than includes the intersection point
         if orientation == Orientation.VERTICAL:
             row = start_row + 1
             while row < self.rows:
                 if self.check_cell_is_legal(row, start_col, row + 1,
-                                             start_col, Orientation.VERTICAL):
+                                            start_col, Orientation.VERTICAL):
                     candidate.append(self.grid[row][start_col])
                 else:
                     break
@@ -116,7 +118,7 @@ class Crossword:
             row = start_row - 1
             while row >= 0:
                 if self.check_cell_is_legal(row, start_col, row - 1,
-                                             start_col, Orientation.VERTICAL):
+                                            start_col, Orientation.VERTICAL):
                     candidate.insert(0, self.grid[row][start_col])
 
                     # Move the root row back to match the new legal start to the potential word
@@ -128,7 +130,7 @@ class Crossword:
             col = start_col + 1
             while col < self.cols:
                 if self.check_cell_is_legal(start_row, col, start_row,
-                                             col + 1, Orientation.HORIZONTAL):
+                                            col + 1, Orientation.HORIZONTAL):
                     candidate.append(self.grid[start_row][col])
                 else:
                     break
@@ -136,7 +138,7 @@ class Crossword:
             col = start_col - 1
             while col >= 0:
                 if self.check_cell_is_legal(start_row, col, start_row,
-                                             col - 1, Orientation.HORIZONTAL):
+                                            col - 1, Orientation.HORIZONTAL):
                     candidate.insert(0, self.grid[start_row][col])
 
                     # Move the root column back to match the new legal start to the potential word
@@ -144,7 +146,7 @@ class Crossword:
                 else:
                     break
                 col -= 1
-        
+
         # If the first or last character of the candidate is adjacent to an existing word
         # without intersecting it, remove it.
         (candidate, start_row, start_col) = self.check_for_adjacency(candidate,
@@ -161,12 +163,12 @@ class Crossword:
         # If no shorter candidate is possible, return None and forget this intersection point
         while len(matches) == 0:
             shorter_candidate = self.trim_candidate(
-                                        candidate,
-                                        orientation,
-                                        start_row,
-                                        start_col,
-                                        original_row,
-                                        original_col)
+                candidate,
+                orientation,
+                start_row,
+                start_col,
+                original_row,
+                original_col)
             if shorter_candidate is None:
                 return None
             matches = find_matches(shorter_candidate, self.word_length_map, self.word_dict)
@@ -205,7 +207,7 @@ class Crossword:
         if orientation == Orientation.HORIZONTAL:
             if start_col > 0 and self.grid[start_row][start_col - 1] != '_':
                 candidate.pop(0)
-                start_col +=1
+                start_col += 1
             at_edge = start_col + len(candidate) >= self.cols
             if not at_edge and self.grid[start_row][start_col + len(candidate)] != '_':
                 candidate.pop()
@@ -218,7 +220,7 @@ class Crossword:
             if not at_edge and self.grid[start_row + len(candidate)][start_col] != '_':
                 candidate.pop()
             return (candidate, start_row, start_col)
-        
+
         return (candidate, start_row, start_col)
 
     def check_cell_is_legal(self, row, col, next_row, next_col, orientation):
@@ -257,7 +259,7 @@ class Crossword:
         elif orientation == Orientation.HORIZONTAL:
             has_cell_above = row > 0
             has_cell_below = row < self.rows - 1
-            if has_cell_above and self.grid[row -1][col] != "_":
+            if has_cell_above and self.grid[row - 1][col] != "_":
                 return False
             if has_cell_below and self.grid[row + 1][col] != "_":
                 return False
@@ -290,7 +292,7 @@ class Crossword:
         new_start_col = word.start_col
         new_start_row = word.start_row
         new_orientation = word.orientation.opposite()
-        
+
         # A character in the crossword grid belonging to a word can be used
         # as an intersection point for future words as long as it doesn't have
         # occupied neighbouring cells in the direction orthogonal to the word,
@@ -352,7 +354,7 @@ class Crossword:
                     cell_before_occupied = True
                 if row < self.rows - 2 and self.grid[row + 1][col] != '_':
                     cell_after_occupied = True
-            
+
             # Both cells must be usable in order for an intersection to be retained
             if not cell_before_occupied and not cell_after_occupied:
                 temp_set.add(item)
@@ -385,13 +387,13 @@ class Crossword:
                 if clue.index == index:
                     requested_clue = clue
         return requested_clue
-        
+
     def reindex_clues(self):
         """Reindexes the clues so that they are ordered from left to right, and
            top to bottom. Ensures that clues across and down that share the same
            start_cell in the crossword grid use the same index, as only one
            index can be printed per cell in the terminal"""
-        
+
         # Create a dictionary, to hold the clues keyed by a tuple containing the
         # start_col and start_row
         clues_dict = {}
@@ -462,7 +464,7 @@ class Crossword:
         text_color = Colors.get_foreground_color(0, 0, 0)
         origin_row = 4
         origin_col = 4
-        
+
         for i, row in enumerate(self.grid):
             display_chars = []
             for j, char in enumerate(row):

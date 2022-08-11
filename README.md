@@ -65,10 +65,49 @@ was organised into 2 python dictionaries.
 An object-oriented approach was employed for the process of crossword generation. The concepts of Word, Clue, and Crossword were encapsulated in their own respective classes. The Crossword class is the most complex of these, as it is responsible for the task of generating legal crossword puzzles within a set of constraints.
 
 ### 2: Crossword, Clue and Word classes
--   The Crossword class is composed of the following data structures.
-    - **crossword.grid** A 2-dimensional array of characters, with values as follows.
-    Unused squares are represented by a '_'
+-   The Crossword class is composed of the following data structures and elements.
+    - `crossword.rows` The number of rows in the crossword.
+    - `crossword.cols` The number of columns in the crossword.
+    - `crossword.grid` A 2-dimensional array of characters, with values as follows.
+    Unused squares are represented by a '_', and cells occupied by the letters
+    of clues are contain those letters in lowercase.
+    - `crossword.letter_use` A 2-dimensional array, matching grid (above) in size,
+    which contains enum values of type LetterUse. This is used to indicate to the word
+    generation algorithm whether existing clues are already using a cell in the horizontal
+    or vertical direction, or both.
+    - `crossword.user_guesses` Another 2-d array, matching grid in size, which contains
+    the guesses that a user has entered.
+    - `crossword.word_dict` A reference to the dictionary loaded from file in `run.py`, which 
+    contains a list of all possible words, their frequencies, and their definitions.
+    - `crossword.word_length_map` A reference to a python dictionary with word lengths as keys, and lists
+    of words of that length as values, to enable a candidate word of known length to be 
+    matched against dictionary words of the same length.
+    - `crossword.clues_across` A list of the clues in the across (horizontal) direction.
+    - `crossword.clues_down` A list of the clues in the down (vertical) direction.
+    - `crossword.selected_clue` The clue currently selected by the user.
 
+-   The Clue class is composed of these data structures and elements:
+    - `clue.string` The characters that compose the clue's solution
+    - `clue.index` The number assigned to the clue, used by the user for 
+    identification.
+    - `clue.orientation` The direction the clue string runs in.
+    - `clue.definitions` A list of definitions of the word used, minimum 1
+    - `clue.current_definition` The index of the current clue being displayed to
+    the user. The user can cycle through the possible definitions by entering '?'
+    repeatedly - this variable keeps track of which one is currently visible.
+    - `clue.start_row` The row the clue word starts on.
+    - `clue.start_col` The column the clue word starts on.
+
+-   The Word class is composed of the follow data structures and elements
+    - `word.orientation` The direction the word runs in
+    - `word.string` The characters that make up the word
+    - `word.start_row` The row the word starts on.
+    - `word.start_col` The column the word starts on.
+
+### Future improvements to the data structures used
+It would be a good idea to simplify the code by removing `clue.string`, `clue.orientation`,
+`clue.start_row` and `clue.start_col`, and replacing them with a single field of
+type `Word`, which itself contains the same fields.
 
 ## Execution Paths
 
