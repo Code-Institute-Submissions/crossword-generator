@@ -26,6 +26,8 @@ to solve them using a command line interface.
     - As a returning visitor, I would like to be able to request an alternate clue when I am stuck.
 
 ## Design
+<details>
+<summary>Click to expand the design section</summary>
 The design of the program had to work within the constraints of an 80x24 terminal window, so layout of the crossword, clues and instructions was very important. I elected to display the crossword twice:
 - The first view displays the empty layout and clue numbers, to act as a reference for the user.
 - The second view displays the answers that the user has already input.
@@ -114,13 +116,18 @@ type `Word`, which itself contains the same fields.
 ![flowchart for crossword generation](documentation_images/crossword_generation.png)
 
 ![flowchart for puzzle solver](documentation_images/crossword_puzzle_flow.png)
+</details>
 
 # Testing
-Four different testing approaches were used in the project:
+<details>
+<summary>Testing methods</summary>
+
+
 - Manual testing
 - Automated testing
 - In-app testing
 - User story testing
+- Validator testing
 
 ## Manual Testing
 ## Automated Testing
@@ -144,6 +151,9 @@ For this reason, the project contains the python file `crossword_validation.py`,
 - #### Returning Visitor Goals
     - *As a returning visitor, I would like to be able to request an alternate clue when I am stuck.* 
     Entering a question mark will present the user with all of the alternative definitions of the word that exist, or inform them if there is only one.
+## Validator Testing
+</details>
+
 # Bugs
 ## Solved Bugs
 
@@ -153,7 +163,7 @@ The bug was solved by checking that the orientation of the intersecting word was
 
 ## Remaining Bugs
 There are no outstanding bugs in the project. 
-## Validator Testing
+
 
 ## Libraries and Programs Used
 1. [Lucid](https://www.lucidchart.com/pages/)
