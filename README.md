@@ -201,6 +201,9 @@ For this reason, the project contains the python file `crossword_validation.py`,
     - *As a returning visitor, I would like to be able to request an alternate clue when I am stuck.* 
     Entering a question mark will present the user with all of the alternative definitions of the word that exist, or inform them if there is only one.
 ## Validator Testing
+All python files pass online PEP8 validation, with the exception of test_crossword_generator.py, 
+which fails only on line lengths. I would argue that these failures are acceptable
+due to the importance of having expressive method names for the tests.
 
 [Return to top](#Crossword-Generator)
 
