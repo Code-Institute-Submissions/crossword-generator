@@ -3,13 +3,13 @@
 A python project that creates random crossword puzzles, and then allows the user to try 
 to solve them using a command line interface.
 
-[Screenshots](Screenshots)
+[Screenshots](#Screenshots)
 
-[Features](Features)
+[Features](#Features)
 
-[User Stories](User Stories)
+[User Stories](#User Stories)
 
-[Design](Design)
+[Design](#Design)
 
 [Development Process](#Development Process)
 
@@ -41,7 +41,7 @@ to solve them using a command line interface.
 
 # UX - User Experience
 
-## User Stories - 
+## User Stories
 - #### First Time Visitor Goals
     - As a first-time visitor, I want to be able to quickly engage in the game, 
     - As a first-time visitor, I would like an easy, simple to use interface
