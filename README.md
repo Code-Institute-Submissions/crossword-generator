@@ -1,4 +1,4 @@
-# Crossword-Generator
+# Crossword Generator
 
 A python project that creates random crossword puzzles, and then allows the user to try 
 to solve them using a command line interface.
@@ -7,11 +7,9 @@ to solve them using a command line interface.
 
 [Features](#Features)
 
-[User Stories](#User Stories)
+[User Experience](#User-Experience)
 
-[Design](#Design)
-
-[Development Process](#Development Process)
+[Development Process](#Development-Process)
 
 [Testing](#Testing)
 
@@ -31,6 +29,8 @@ to solve them using a command line interface.
 ![Screenshot of the clues down view](documentation_images/clues_down_screenshot.png)
 ![Screenshot of the instructions view](documentation_images/instructions_screenshot.png)
 
+[Return to top](#Crossword-Generator)
+
 ## Features
 - Random crossword generation.
 - User entry of clue solutions on the crossword grid
@@ -39,7 +39,8 @@ to solve them using a command line interface.
 ### Future Features
 - A future extension of the project could involve the development of a GUI, ideally deployed to the web, where a user could request a generated crossword from the backend and then curate the clues, adding their own alternatives of greater or lesser difficulty, and asking the backend to find alternative words for particular positions in the crossword. The model of using dictionary definitions as clues does produce a usable result as a prototype, but keeping the difficulty and obscurity of the clues within a tight range that would be satisfying to the puzzle solver is probably best done by a human in the loop. 
 
-# UX - User Experience
+[Return to top](#Crossword-Generator)
+# User Experience
 
 ## User Stories
 - #### First Time Visitor Goals
@@ -50,8 +51,6 @@ to solve them using a command line interface.
     - As a returning visitor, I would like to be able to request an alternate clue when I am stuck.
 
 ## Design
-<details>
-<summary>Click to expand the design section</summary>
 The design of the program had to work within the constraints of an 80x24 terminal window, so layout of the crossword, clues and instructions was very important. I elected to display the crossword twice:
 - The first view displays the empty layout and clue numbers, to act as a reference for the user.
 - The second view displays the answers that the user has already input.
@@ -68,6 +67,7 @@ Below the navigation bar, the prompt appears where the user can input their answ
 
 The navigation bar and the input prompt are common to all four screens, to ensure that the user has a consistent experience using the program.
 
+[Return to top](#Crossword-Generator)
 
 # Development Process
 There were two distinct development phases in this project, with the first phase involving the creation of a data source for generating the crossword puzzles. The process of assembling the data is outlined [here](DATA_PREPARATION.md). 
@@ -140,13 +140,10 @@ type `Word`, which itself contains the same fields.
 ![flowchart for crossword generation](documentation_images/crossword_generation.png)
 
 ![flowchart for puzzle solver](documentation_images/crossword_puzzle_flow.png)
-</details>
+
+[Return to top](#Crossword-Generator)
 
 # Testing
-<details>
-<summary>Testing methods</summary>
-
-
 - Manual testing
 - Automated testing
 - In-app testing
@@ -204,7 +201,8 @@ For this reason, the project contains the python file `crossword_validation.py`,
     - *As a returning visitor, I would like to be able to request an alternate clue when I am stuck.* 
     Entering a question mark will present the user with all of the alternative definitions of the word that exist, or inform them if there is only one.
 ## Validator Testing
-</details>
+
+[Return to top](#Crossword-Generator)
 
 # Bugs
 ## Solved Bugs
@@ -216,6 +214,7 @@ The bug was solved by checking that the orientation of the intersecting word was
 ## Remaining Bugs
 There are no outstanding bugs in the project. 
 
+[Return to top](#Crossword-Generator)
 
 ## Libraries and Programs Used
 1. [Lucid](https://www.lucidchart.com/pages/)
@@ -243,6 +242,10 @@ yourself, you can follow this procedure:
 - Link your Heroku app to the repository
 - Click on `DEPLOY`
 
+[Return to top](#Crossword-Generator)
+
 ## Credits
 - Code Institute for the deployment terminal
 - [Choose random enum from list](https://stackoverflow.com/questions/47353555/how-to-get-random-value-of-attribute-of-enum-on-each-iteration)
+
+[Return to top](#Crossword-Generator)
