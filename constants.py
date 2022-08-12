@@ -1,24 +1,11 @@
 import enum
 import random
 
+
 class UniChars(str, enum.Enum):
-    """ 
-    Holds the Unicode characters used in the game 
     """
-    MIDDLE_DOT = "\u00B7"
-    PLANE_EAST = "\u25B6"
-    PLANE_WEST = "\u25C0"
-    PLANE_NORTH = "\u25B2"
-    PLANE_SOUTH = "\u25BC"
-    BOX_HORIZONTAL = "\u2550"
-    BOX_VERTICAL = "\u2551"
-    BOX_TOP_LEFT = "\u2554"
-    BOX_TOP_RIGHT = "\u2557"
-    BOX_BOTTOM_RIGHT = "\u255D"
-    BOX_BOTTOM_LEFT = "\u255A"
-    HORIZONTAL_LINE = "\u2500"
-    LEFT_ARROW = "\u27F5"
-    STAR = "\u2605"
+    Holds the Unicode characters used in the game
+    """
     SUPERSCRIPT = [
         '\u00B9',
         '\u00B2',
@@ -55,7 +42,7 @@ class UniChars(str, enum.Enum):
             return '\u2079'
         elif index == 0:
             return '\u2070'
-    
+
 
 class Colors(str, enum.Enum):
     """
@@ -73,7 +60,6 @@ class Colors(str, enum.Enum):
     BACKGROUND_CYAN = "\x1b[48;5;14m"
     BACKGROUND_ORANGE = "\x1b[48;5;208m"
     BACKGROUND_RED = "\x1b[48;5;9m"
-    
 
     @staticmethod
     def random():
@@ -90,13 +76,16 @@ class Colors(str, enum.Enum):
 
     @staticmethod
     def get_foreground_color(r, g, b):
-        """Return a code to change the foreground color to the values provided"""
+        """Return a code to change the foreground color to the values
+           provided"""
         return f"\x1b[38;2;{r};{g};{b}m"
 
     @staticmethod
     def get_background_color(r, g, b):
-        """Return a code to change the background color to the values provided"""
+        """Return a code to change the background color to the values
+           provided"""
         return f"\x1b[48;2;{r};{g};{b}m"
+
 
 class AnsiCommands(str, enum.Enum):
     """
@@ -118,7 +107,8 @@ class AnsiCommands(str, enum.Enum):
     BOLD = "\x1b[1m"
     DEFAULT_COLOR = "\x1b[00m"
 
-class Orientation (enum.Enum):
+
+class Orientation(enum.Enum):
     """
     Represents the 2 directions a word can be printed in
     """
@@ -132,7 +122,8 @@ class Orientation (enum.Enum):
         else:
             return Orientation.HORIZONTAL
 
-class LetterUse (enum.Enum):
+
+class LetterUse(enum.Enum):
     """
     Represents the orientation of the words that use this letter
     in the grid
@@ -142,7 +133,8 @@ class LetterUse (enum.Enum):
     BOTH = "Both"
     NONE = "None"
 
-class ViewType (enum.Enum):
+
+class ViewType(enum.Enum):
     """
     Represents the 4 views that the user can cycle through by
     hitting enter at the command prompt
@@ -156,7 +148,7 @@ class ViewType (enum.Enum):
         """Cycle through the enum values, returning to the first value
            once the last is passed"""
         index = self.value
-        index +=1
+        index += 1
         if index >= len(list(ViewType)):
             index = 0
         return ViewType(index)
