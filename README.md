@@ -16,7 +16,7 @@ to solve them using a command line interface.
 ## How to play
 
 ## Features
-- Random crossword generation, with different puzzle sizes possible.
+- Random crossword generation.
 - User entry of clue solutions on the crossword grid
 - User selection of alternate clues when available
 
@@ -138,6 +138,34 @@ type `Word`, which itself contains the same fields.
 - Validator testing
 
 ## Manual Testing
+There are four types of user input possible:
+1. Entering the answer to a clue, in the form of a single string of text of the correct length
+2. Entering the description of a clue, ie '2 across', or '1 down'
+3. Simply pressing enter without entering anything, to cycle through the available views
+4. Entering a question mark, '?', cycles through the alternative definitions available, if any.
+
+These were tested as follows:
+1. Text answer to clues:
+   - Tried entering an answer of the correct length, consisting only of letters - program displays the
+   answer entered on the right-hand puzzle and responds with a confimation message at the 
+   bottom of the screen.
+   - Tried entering answers both too long and too short - program responds correctly with an error
+   message informing the user of the mistake, and the expected length of the correct input.
+   - Tried entering mixed alphabetical, numerical and punctuation characters - program responds correctly
+   with the error message 'Solutions can only contain letters'
+2. Clue specifier:
+   - Tried entering the digit '1' followed by 'across' - program correctly displays this clue.
+   - Tried entering just a digit alone, eg '3' - program correctly responds with an error message
+   'Enter 3 followed by "down" or "across"'
+   - Tried entering a clue that does not appear in the puzzle, eg '234 down' - program correctly 
+   responds with the error message 'No clue matches 234 down!'
+3. Cycling through views:
+   - Tried pressing enter repeatedly - program displays each of the four possible views in turn.
+4. Alternative definitions:
+   - Tried entering a question mark - program correctly cycles through the available definitions, returning
+   to the first when all have been shown once.
+   - Tried entering a question mark on a clue with only one definition - program correctly responds with 
+   the message - 'There's only one clue for that word!'
 ## Automated Testing
 Automated testing was added using the pytest library. Due to time constraints, I concentrated on testing the functions
 in the Crossword class, as these are the most opaque and hard to debug, given that they involve manipulation

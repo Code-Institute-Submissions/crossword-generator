@@ -400,7 +400,7 @@ def parse_command(command, crossword, current_view):
 
         if check_crossword_complete(crossword):
             return "You've cracked it! The crossword is completed!"
-        return "Not finished yet, young apprentice."
+        return f"Your answer '{word}' has been entered in the puzzle."
 
 
 def check_crossword_complete(crossword):
