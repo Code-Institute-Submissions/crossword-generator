@@ -1,7 +1,7 @@
 # Crossword Generator
 
 A python project that creates random crossword puzzles, and then allows the user to try 
-to solve them using a command line interface.
+to solve them using a command line interface. The live project can be viewed [here](https://crossword-puzzle-p3.herokuapp.com/)
 
 [Screenshots](#Screenshots)
 
