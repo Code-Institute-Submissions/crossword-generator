@@ -507,10 +507,13 @@ class Crossword:
         for i, row in enumerate(self.grid):
             display_chars = []
             for j, char in enumerate(row):
-                letter = get_large_letter("x")
+                letter = None
                 color = get_alternating_square_color(i, j)
                 if show_letters:
                     letter = get_large_letter(char)
+                else:
+                    rand = random.randint(97, 122)
+                    letter = get_large_letter(chr(rand))
                 if char == '_':
                     display_chars.append(f"{dark_gray}  "
                                          f"{AnsiCommands.DEFAULT_COLOR}")

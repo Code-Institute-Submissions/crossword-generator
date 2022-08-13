@@ -15,8 +15,8 @@ from source.constants import (AnsiCommands, Colors, UniChars, Orientation,
                               ViewType, get_large_letter)
 from source.crossword_validator import validate
 
-TERMINAL_WIDTH = 80
-TERMINAL_HEIGHT = 24
+TERMINAL_WIDTH = 90
+TERMINAL_HEIGHT = 40
 START_ROW = 2
 START_COL = 2
 LIGHT_GRAY = Colors.get_background_color(220, 220, 220)
@@ -28,7 +28,7 @@ TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 def main():
     """Main entry point for the program"""
     (word_dict, word_length_map) = build_dictionary_and_length_map()
-    crossword = Crossword(10, 10, word_length_map, word_dict)
+    crossword = Crossword(16, 16, word_length_map, word_dict)
     validate(crossword)
 
     begin_puzzle(crossword)
@@ -71,8 +71,8 @@ def begin_puzzle(crossword):
                 or current_view == ViewType.CLUES_ACROSS:
             msg = "Hit enter to change view: \n"
         elif current_view == ViewType.INSTRUCTIONS:
-            msg = "Hit enter to move to crossword view"
-        command = input(msg)
+            msg = "Hit enter to move to crossword view\n"
+        command = input(f"{AnsiCommands.BOLD}{Colors.FOREGROUND_WHITE}{msg}")
         if command != '':
             # The user may be entering the solution to a clue, or
             # requesting a clue to be displayed
