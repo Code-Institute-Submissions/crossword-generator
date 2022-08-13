@@ -15,8 +15,8 @@ from source.constants import (AnsiCommands, Colors, UniChars, Orientation,
                               ViewType, get_large_letter)
 from source.crossword_validator import validate
 
-TERMINAL_WIDTH = 90
-TERMINAL_HEIGHT = 40
+TERMINAL_WIDTH = 80
+TERMINAL_HEIGHT = 24
 START_ROW = 2
 START_COL = 2
 LIGHT_GRAY = Colors.get_background_color(220, 220, 220)
@@ -28,7 +28,7 @@ TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 def main():
     """Main entry point for the program"""
     (word_dict, word_length_map) = build_dictionary_and_length_map()
-    crossword = Crossword(16, 16, word_length_map, word_dict)
+    crossword = Crossword(11, 11, word_length_map, word_dict)
     validate(crossword)
 
     begin_puzzle(crossword)
