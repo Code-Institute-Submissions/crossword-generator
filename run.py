@@ -8,12 +8,12 @@ import sys
 import json
 from collections import defaultdict
 
-from crossword_generator import Crossword
-from utilities import (draw_string, get_move_cursor_string,
-                       get_alternating_square_color)
-from constants import (AnsiCommands, Colors, UniChars, Orientation, ViewType,
-                       get_large_letter)
-from crossword_validator import validate
+from source.crossword_generator import Crossword
+from source.utilities import (draw_string, get_move_cursor_string,
+                              get_alternating_square_color)
+from source.constants import (AnsiCommands, Colors, UniChars, Orientation,
+                              ViewType, get_large_letter)
+from source.crossword_validator import validate
 
 TERMINAL_WIDTH = 80
 TERMINAL_HEIGHT = 24

@@ -1,9 +1,9 @@
-from crossword_generator import Crossword
+from source.crossword_generator import Crossword
 from run import build_dictionary_and_length_map
 
 import pytest
-from constants import LetterUse, Orientation
-from utilities import Clue
+from source.constants import LetterUse, Orientation
+from source.utilities import Clue
 
 
 @pytest.fixture

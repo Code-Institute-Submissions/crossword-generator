@@ -24,10 +24,10 @@ to solve them using a command line interface.
 
 
 ## Screenshots
-![Screenshot of the 2 puzzles view](documentation_images/two_puzzle_screenshot.png)
-![Screenshot of the clues across view](documentation_images/clues_across_screenshot.png)
-![Screenshot of the clues down view](documentation_images/clues_down_screenshot.png)
-![Screenshot of the instructions view](documentation_images/instructions_screenshot.png)
+![Screenshot of the 2 puzzles view](documentation/documentation_images/two_puzzle_screenshot.png)
+![Screenshot of the clues across view](documentation/documentation_images/clues_across_screenshot.png)
+![Screenshot of the clues down view](documentation/documentation_images/clues_down_screenshot.png)
+![Screenshot of the instructions view](documentation/documentation_images/instructions_screenshot.png)
 
 [Return to top](#Crossword-Generator)
 
@@ -70,7 +70,7 @@ The navigation bar and the input prompt are common to all four screens, to ensur
 [Return to top](#Crossword-Generator)
 
 # Development Process
-There were two distinct development phases in this project, with the first phase involving the creation of a data source for generating the crossword puzzles. The process of assembling the data is outlined [here](DATA_PREPARATION.md). 
+There were two distinct development phases in this project, with the first phase involving the creation of a data source for generating the crossword puzzles. The process of assembling the data is outlined [here](documentation/DATA_PREPARATION.md). 
 
 The second phase involved writing the code to generate the crossword, and allow the user to enter their guesses on the crossword grid.
 
@@ -137,9 +137,9 @@ type `Word`, which itself contains the same fields.
 
 ## Execution Paths
 
-![flowchart for crossword generation](documentation_images/crossword_generation.png)
+![flowchart for crossword generation](documentation/documentation_images/crossword_generation.png)
 
-![flowchart for puzzle solver](documentation_images/crossword_puzzle_flow.png)
+![flowchart for puzzle solver](documentation/documentation_images/crossword_puzzle_flow.png)
 
 [Return to top](#Crossword-Generator)
 
@@ -250,5 +250,6 @@ yourself, you can follow this procedure:
 ## Credits
 - Code Institute for the deployment terminal
 - [Choose random enum from list](https://stackoverflow.com/questions/47353555/how-to-get-random-value-of-attribute-of-enum-on-each-iteration)
+- collections.defaultdict : Recommended by my mentor, Celestine Okoro.
 
 [Return to top](#Crossword-Generator)

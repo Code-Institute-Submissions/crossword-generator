@@ -46,7 +46,7 @@ def main():
         f"{not_in_freq_dict_count} not in frequency dict")
 
     try:
-        with open('data/crossword_dictionary.json',
+        with open('../data/crossword_dictionary.json',
                   'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(word_dict, indent=4))
     except FileExistsError:
@@ -59,7 +59,7 @@ def load_word_frequencies():
        have a frequency of more than 500, then saves these entries to a new
        file."""
     freq_dict = {}
-    with open('data/enwiki-20210820-words-frequency.txt',
+    with open('../data/enwiki-20210820-words-frequency.txt',
               'r', encoding='utf-8') as infile:
         for line in infile:
             elements = line.split(' ')
@@ -70,7 +70,7 @@ def load_word_frequencies():
                 break
 
     try:
-        with open('data/wiki-words-freq1000+.txt',
+        with open('../data/wiki-words-freq1000+.txt',
                   'x', encoding='utf-8') as outfile:
             for key, value in freq_dict.items():
                 outfile.writelines(f"{key} {value}\n")
@@ -87,7 +87,7 @@ def load_large_dictionary():
     word_list = []
     of_count = 0
     contains_word_count = 0
-    with open('data/large_dictionary.txt', 'r', encoding='utf-8') as file:
+    with open('../data/large_dictionary.txt', 'r', encoding='utf-8') as file:
         for line in file:
             # Separate out all the comma separated values
             split_line = line.split(',')
@@ -130,7 +130,7 @@ def load_large_dictionary():
     # Write the sorted list of tuples to a new file. In order to avoid
     # confusion, use the pipe '|' instead of the comma ',' as separator.
     try:
-        with open('data/large_dict_words_only.txt',
+        with open('../data/large_dict_words_only.txt',
                   'w', encoding='utf-8') as write_file:
             for word in word_list:
                 write_file.writelines(f"{word[0]}|{word[1]}\n")

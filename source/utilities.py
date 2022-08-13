@@ -1,4 +1,4 @@
-from constants import AnsiCommands, Colors
+from source.constants import AnsiCommands, Colors
 import sys
 
 
