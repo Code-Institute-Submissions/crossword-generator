@@ -6,6 +6,8 @@ the user input loop to let the user attempt the puzzle
 """
 import sys
 import json
+from collections import defaultdict
+
 from crossword_generator import Crossword
 from utilities import (draw_string, get_move_cursor_string,
                        get_alternating_square_color)
@@ -35,7 +37,7 @@ def main():
 def build_dictionary_and_length_map():
     """Import the word dictionary from file, and use it to build
        a map of words keyed by their lengths"""
-    word_length_map = {}
+    word_length_map = defaultdict(lambda: [])
     with open('data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
         word_dict = json.load(file)
 
@@ -45,12 +47,8 @@ def build_dictionary_and_length_map():
         for word in word_dict.keys():
             word = word.replace('\n', '')
             length = len(word)
-            if length in word_length_map:
-                word_length_map[length].append(word)
-            else:
-                word_length_map[length] = []
-                word_length_map[length].append(word)
-    return (word_dict, word_length_map)
+            word_length_map[length].append(word)
+    return word_dict, word_length_map
 
 
 def begin_puzzle(crossword):
@@ -81,6 +79,7 @@ def begin_puzzle(crossword):
                         0,
                         TERMINAL_HEIGHT,
                         [Colors.FOREGROUND_RED])
+            current_view = ViewType.CROSSWORD
         else:
             # The user is toggling through the views
             current_view = current_view.next()
