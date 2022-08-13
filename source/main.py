@@ -64,7 +64,7 @@ def load_word_frequencies():
         for line in infile:
             elements = line.split(' ')
             frequency = int(elements[1].replace('\n', ''))
-            if frequency >= 1000:
+            if frequency >= 100000:
                 freq_dict[elements[0]] = frequency
             else:
                 break
