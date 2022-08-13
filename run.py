@@ -119,9 +119,10 @@ def display_instructions(current_view):
         "   3) All of the Down clues\n"
         "   4) This instructions page again!\n\n"
         " To enter your answer for the current clue, simply type it into the"
-        " terminal\n\n"
+        " terminal.\n"
         " To switch to another clue, enter its description, e.g. '2 across' or"
-        " '7 down'.\n")
+        " '7 down'.\n"
+        " To ask for an alternative clue, enter '?'")
     draw_string(style + para1, 0, 4, [])
     print_view_type_bar(current_view)
 

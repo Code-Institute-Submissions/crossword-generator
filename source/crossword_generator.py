@@ -52,7 +52,7 @@ class Crossword:
         # Find words matching this initial string, and add it to a random row.
         matches = find_matches(blank_string, self.word_length_map,
                                self.word_dict)
-        choice = matches[0]
+        choice = random.choice(matches)
         random_row = random.randint(0, self.rows - 1)
         first_word = Word(Orientation.HORIZONTAL, choice, random_row, 0)
         self.add_word_to_grid(first_word)
@@ -71,7 +71,7 @@ class Crossword:
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
                 if user_present:
-                    self.print(show_letters=True)
+                    self.print(show_letters=False)
                 else:
                     self.print(show_letters=True)
 
