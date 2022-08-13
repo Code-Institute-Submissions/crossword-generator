@@ -71,7 +71,7 @@ class Crossword:
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
                 if user_present:
-                    self.print(show_letters=False)
+                    self.print(show_letters=True)
                 else:
                     self.print(show_letters=True)
 

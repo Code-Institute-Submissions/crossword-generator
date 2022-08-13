@@ -251,5 +251,6 @@ yourself, you can follow this procedure:
 - Code Institute for the deployment terminal
 - [Choose random enum from list](https://stackoverflow.com/questions/47353555/how-to-get-random-value-of-attribute-of-enum-on-each-iteration)
 - collections.defaultdict : Recommended by my mentor, Celestine Okoro.
+- [Remove extra whitespace characters from string](https://statisticsglobe.com/python-remove-whitespace-in-string)
 
 [Return to top](#Crossword-Generator)

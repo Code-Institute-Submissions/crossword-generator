@@ -71,7 +71,7 @@ def load_word_frequencies():
 
     try:
         with open('../data/wiki-words-freq1000+.txt',
-                  'x', encoding='utf-8') as outfile:
+                  'w', encoding='utf-8') as outfile:
             for key, value in freq_dict.items():
                 outfile.writelines(f"{key} {value}\n")
     except FileExistsError:
@@ -87,7 +87,7 @@ def load_large_dictionary():
     word_list = []
     of_count = 0
     contains_word_count = 0
-    with open('../data/large_dictionary.txt', 'r', encoding='utf-8') as file:
+    with open('../data/large_dictionary_2.txt', 'r', encoding='utf-8') as file:
         for line in file:
             # Separate out all the comma separated values
             split_line = line.split(',')
