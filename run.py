@@ -67,8 +67,11 @@ def begin_puzzle(crossword):
         sys.stdout.flush()
         msg = ("Enter answer, select clue (e.g. '2 across'), "
                "or hit enter to change view :\n")
-        if current_view != ViewType.CROSSWORD:
+        if current_view == ViewType.CLUES_DOWN \
+                or current_view == ViewType.CLUES_ACROSS:
             msg = "Hit enter to change view: \n"
+        elif current_view == ViewType.INSTRUCTIONS:
+            msg = "Hit enter to move to crossword view"
         command = input(msg)
         if command != '':
             # The user may be entering the solution to a clue, or
