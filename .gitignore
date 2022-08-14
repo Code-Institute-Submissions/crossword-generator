@@ -9,3 +9,4 @@ node_modules/
 venv/
 .vscode
 database_reader.py
+source/database_reader.py
