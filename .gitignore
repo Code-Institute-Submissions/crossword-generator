@@ -8,4 +8,4 @@ node_modules/
 .github/
 venv/
 .vscode
-source/database_reader.py
+database_reader.py
