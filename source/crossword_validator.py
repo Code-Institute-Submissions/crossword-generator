@@ -7,7 +7,8 @@ from source.crossword_generator import Crossword
 def main():
     """Main entry point for the program"""
     word_length_map = {}
-    with open('../data/crossword_dictionary.json', 'r', encoding='utf-8') as file:
+    with open('../data/crossword_dictionary.json', 'r',
+              encoding='utf-8') as file:
         word_dict = json.load(file)
 
         # Build a python dictionary with word lengths as keys, and lists of
