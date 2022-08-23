@@ -55,8 +55,6 @@ def begin_puzzle(crossword):
     """Allows the user to begin solving the puzzle"""
     current_view = ViewType.INSTRUCTIONS
     display_instructions(current_view)
-    # display_crossword(crossword, current_view)
-    # highlight_single_clue(crossword)
 
     while True:
         input_y_pos = TERMINAL_HEIGHT - 2
@@ -357,7 +355,7 @@ def parse_command(command, crossword, current_view):
         if len(elements) == 1:
             return f"Enter {elements[0]} followed by 'down' or 'across'"
         index = int(elements[0])
-        # Check if this is a valic reference to a clue, and if so, highlight
+        # Check if this is a valid reference to a clue, and if so, highlight
         # that clue
         if elements[1].lower() == 'd' or elements[1].lower() == 'down':
             if crossword.has_clue(index, Orientation.VERTICAL):
