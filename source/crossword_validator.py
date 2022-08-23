@@ -72,14 +72,16 @@ def validate(crossword):
 
 
 def check_for_2x2_groups(crossword):
-    """Test ensures that no 2x2 group of contiguous cells are all occupied"""
+    """Test ensures that no 2x2 group of contiguous cells are all occupied.
+       If such a group is full, it means that there are at least 2 clues
+       running parallel to each other 1 square apart, which generates a
+       number of extra unwanted 2-letter words"""
     for i in range(crossword.rows - 1):
         for j in range(crossword.cols - 1):
-            group = []
-            group.append(crossword.grid[i][j])
-            group.append(crossword.grid[i][j + 1])
-            group.append(crossword.grid[i + 1][j])
-            group.append(crossword.grid[i + 1][j + 1])
+            group = [crossword.grid[i][j],
+                     crossword.grid[i][j + 1],
+                     crossword.grid[i + 1][j],
+                     crossword.grid[i + 1][j + 1]]
             if '_' not in group:
                 print(f"Illegal 2x2 group found starting on row {i}, col {j}")
                 return False
