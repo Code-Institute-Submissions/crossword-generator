@@ -29,6 +29,8 @@ class Crossword:
         self.intersections = set()
 
         # If the empty flag is not set to True, generate a random crossword
+        # The empty flag is used by the test suite to generate a crossword
+        # which will be partially filled to facilitate particular tests.
         if not empty:
             self.generate_words(user_present)
             self.reindex_clues()
@@ -66,7 +68,6 @@ class Crossword:
             if next_word is not None:
                 self.add_word_to_grid(next_word)
                 self.add_word_to_clues(next_word)
-                # self.print()
                 self.prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
                 sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
@@ -311,7 +312,7 @@ class Crossword:
                     else LetterUse.BOTH
                 self.letter_use[word.start_row + i][word.start_col] = use
 
-        # Remove the word from the dict_by_length dictionary so that it cannot
+        # Remove the word from the word_length_map dictionary so that it cannot
         # appear twice. This prevents it appearing again in any crossword
         # created in this instance of the program.
         key = len(word.string)
