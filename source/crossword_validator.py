@@ -1,40 +1,4 @@
-import json
-import sys
-from source.constants import AnsiCommands, Orientation
-from source.crossword_generator import Crossword
-
-
-def main():
-    """Main entry point for the program"""
-    word_length_map = {}
-    with open('../data/crossword_dictionary.json', 'r',
-              encoding='utf-8') as file:
-        word_dict = json.load(file)
-
-        # Build a python dictionary with word lengths as keys, and lists of
-        # words of that length as values. The dictionary is used to search for
-        # matching partial words
-        for word in word_dict.keys():
-            word = word.replace('\n', '')
-            length = len(word)
-            if length in word_length_map:
-                word_length_map[length].append(word)
-            else:
-                word_length_map[length] = []
-                word_length_map[length].append(word)
-
-    iterations = 100
-    for counter in range(1, iterations + 1):
-        sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
-        sys.stdout.write(AnsiCommands.CLEAR_SCREEN)
-        print(f"Testing number {counter}")
-        crossword = Crossword(12, 12, word_length_map, word_dict,
-                              user_present=True)
-        result = validate(crossword)
-        if result is False:
-            print(f"problem at iteration {counter}")
-            sys.exit()
-    print(f"Tested {iterations} crosswords ... all valid")
+from source.constants import Orientation
 
 
 def validate(crossword):
@@ -67,6 +31,10 @@ def validate(crossword):
         print("  ...all clues appear in dictionary")
     else:
         return False
+
+    result = check_all_clue_indices_are_unique(crossword)
+    if result:
+        print(" ...all clue indices are unique")
 
     return True
 
@@ -166,5 +134,21 @@ def check_all_clues_appear_in_dictionary(crossword):
     return True
 
 
+def check_all_clue_indices_are_unique(crossword):
+    """Test confirms that no clue index appears twice in either the
+       clues_across or clues_down lists"""
+    if len(set(crossword.clues_across)) < len(crossword.clues_across):
+        print("Duplicate across clue indices:")
+        for clue in crossword.clues_across:
+            print(clue.index)
+        return False
+    if len(set(crossword.clues_down)) < len(crossword.clues_down):
+        print("Duplicate down clue indices:")
+        for clue in crossword.clues_down:
+            print(clue.index)
+        return False
+    return True
+
+
 if __name__ == '__main__':
-    main()
+    multiple_crossword_validate()

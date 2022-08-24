@@ -57,7 +57,7 @@ class Crossword:
         choice = random.choice(matches)
         random_row = random.randint(0, self.rows - 1)
         first_word = Word(Orientation.HORIZONTAL, choice, random_row, 0)
-        self.add_word_to_grid(first_word)
+        self.add_word_to_grid(first_word, user_present)
         self.add_word_to_clues(first_word)
 
         # Loop that generates all subsequent words. Each time a word is
@@ -66,7 +66,7 @@ class Crossword:
         while len(self.intersections) > 0:
             next_word = self._generate_new_word()
             if next_word is not None:
-                self.add_word_to_grid(next_word)
+                self.add_word_to_grid(next_word, user_present)
                 self.add_word_to_clues(next_word)
                 self.prune_intersection_set()
                 sys.stdout.write(AnsiCommands.CLEAR_BUFFER)
@@ -293,7 +293,7 @@ class Crossword:
                 return False
         return True
 
-    def add_word_to_grid(self, word):
+    def add_word_to_grid(self, word, user_present=True):
         """Adds a word to the crossword grid in the correct orientation"""
 
         for i, _ in enumerate(word.string):
@@ -314,9 +314,13 @@ class Crossword:
 
         # Remove the word from the word_length_map dictionary so that it cannot
         # appear twice. This prevents it appearing again in any crossword
-        # created in this instance of the program.
-        key = len(word.string)
-        self.word_length_map[key].remove(word.string)
+        # created in this instance of the program. Don't do this if there is
+        # no user present, as that means the crossword generator is being run
+        # repeatedly by a test, and may run out of words if they are being
+        # removed.
+        if user_present:
+            key = len(word.string)
+            self.word_length_map[key].remove(word.string)
 
         # Calculate the new intersections on this word
         new_start_col = word.start_col
