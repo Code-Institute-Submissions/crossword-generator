@@ -28,7 +28,7 @@ TEXT_COLOR = Colors.get_foreground_color(0, 0, 0)
 def main():
     """Main entry point for the program"""
     (word_dict, word_length_map) = build_dictionary_and_length_map()
-    crossword = Crossword(11, 11, word_length_map, word_dict)
+    crossword = Crossword(13, 13, word_length_map, word_dict)
     validate(crossword)
 
     begin_puzzle(crossword)

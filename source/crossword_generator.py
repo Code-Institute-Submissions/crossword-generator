@@ -84,15 +84,16 @@ class Crossword:
     def add_word_to_clues(self, word):
         """Derive a clue from the word provided, and add it to the list of
            clues"""
-        definitions = self.word_dict[word.string][1]
+        defs = self.word_dict[word.string][1]
+        sorted_defs = sorted(defs, key=len)
         if word.orientation == Orientation.HORIZONTAL:
             clue = Clue(word.string, len(self.clues_across) + 1,
-                        word.orientation, definitions, word.start_row,
+                        word.orientation, sorted_defs, word.start_row,
                         word.start_col)
             self.clues_across.append(clue)
         else:
             clue = Clue(word.string, len(self.clues_down) + 1,
-                        word.orientation, definitions, word.start_row,
+                        word.orientation, sorted_defs, word.start_row,
                         word.start_col)
             self.clues_down.append(clue)
 
